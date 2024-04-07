@@ -5,8 +5,8 @@ name: React Native Build
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'
 
 jobs:
   build:
@@ -49,8 +49,7 @@ jobs:
           path: android/app/build/outputs/apk/debug/app-debug.apk
 
       - name: Releasing using Hub
-        uses: ShaunLWM/action-release-debugapk@master
+        uses: sangatdesai/release-apk@main
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
           APP_FOLDER: app
-          RELEASE_TITLE: New Build
