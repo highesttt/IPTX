@@ -25,7 +25,7 @@ jobs:
         run: npm install
 
       - name: Bundle React Native code
-        run: react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+        run: npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
 
       - name: Build APK
         run: cd android && ./gradlew assembleDebug
