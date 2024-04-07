@@ -24,11 +24,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Create assets folder
+        run: mkdir -p android/app/src/main/assets
+
       - name: Bundle React Native code
         run: npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
 
       - name: Build APK
-        run: cd android && ./gradlew assembleDebug
+        run: cd android && ./gradlew assembleDebug && cd ..
 
       - name: Upload APK as a release
         uses: actions/upload-artifact@v2
