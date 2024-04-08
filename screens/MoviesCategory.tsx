@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
-  ScrollView,
   Text,
   useColorScheme,
   View,
+  ActivityIndicator,
+  FlatList,
+  useWindowDimensions,
 } from 'react-native';
 
 import { getMaterialYouCurrentTheme } from '../utils/theme';
@@ -15,100 +17,118 @@ import { buildURL } from '../utils/buildUrl';
 import { MovieDTO } from '../dto/media/movie.dto';
 import { Card } from 'react-native-paper';
 
-function MoviesCategoryScreen({route, navigation}: any): React.JSX.Element {
+function MoviesCategoryScreen({ route, navigation }: any): React.JSX.Element {
   const [categories, setCategories] = useState<MovieDTO[]>([]);
+  const [loading, setLoading] = useState(true);
   const isDarkMode = useColorScheme() === 'dark';
-  const {category} = route.params;
+  const { category } = route.params;
+  const [visibleCategories, setVisibleCategories] = useState<MovieDTO[]>([]);
+  const CHUNK_SIZE = 30;
 
   const theme = getMaterialYouCurrentTheme(isDarkMode);
 
-  retrieveCategoryInfo(MediaType.MOVIE, category.id).then((data) => {
-    if (categories.length === 0) {
+  useEffect(() => {
+    retrieveCategoryInfo(MediaType.MOVIE, category.id).then((data) => {
       setCategories(data);
-      return;
-    } else {
-      console.log('Categories already loaded');
-    }
-  });
+      setVisibleCategories(data.slice(0, CHUNK_SIZE));
+      setLoading(false);
+    });
+  }, []);
 
-  // for every cat that has a stream_icon preload the image
+  const handleLoadMore = () => {
+    const currentLength = visibleCategories.length;
+    const nextChunk = categories.slice(currentLength, currentLength + CHUNK_SIZE);
+    setVisibleCategories([...visibleCategories, ...nextChunk]);
+  };
+
+  const renderItem = ({ item }: { item: MovieDTO }) => {
+    var flag = item.name.split(' ')[0];
+    var name = item.name.split(' ').slice(1).join(' ');
+    if (flag.length < 2) {
+      flag = item.name.split(' ')[1];
+      name = item.name.split(' ').slice(2).join(' ');
+    }
+    flag = getFlagEmoji(flag);
+
+    return (
+      <Card
+        key={item.id}
+        style={{ backgroundColor: theme.card }}
+        className={'rounded-lg w-44 h-[17rem] relative flex flex-col'}
+        onPress={async () => {
+          const videoUrl = await buildURL(
+            MediaType.MOVIE,
+            item.stream_id,
+            item.extension
+          );
+          navigation.navigate('Player', { url: videoUrl });
+        }}>
+        <View>
+          <Card.Title
+            className="flex-initial"
+            title={item.name}
+            titleStyle={{
+              color: theme.text,
+              fontSize: 12,
+              marginVertical: 10,
+            }}
+            titleNumberOfLines={1}
+          />
+        </View>
+        <View className="items-center">
+          <Card.Cover
+            source={{
+              uri:
+                item.stream_icon != ''
+                  ? item.stream_icon
+                  : 'https://cdn.dribbble.com/users/2639810/screenshots/9403030/media/d1c8b21cbd1972075ea236b1953f884f.jpg',
+            }}
+            style={{
+              resizeMode: 'stretch',
+              width: 130,
+              height: 172,
+              borderRadius: 6,
+              justifyContent: 'center',
+              position: 'relative',
+              marginTop: 4,
+            }}
+            resizeMethod="auto"
+          />
+        </View>
+      </Card>
+    );
+  };
+
+  // calculate how many columns we can fit
+  const windowWidth = useWindowDimensions().width;
+  const numColumns = Math.floor(windowWidth / 180);
 
   return (
-    <SafeAreaView style={{backgroundColor: theme.background}}>
-      <ScrollView
-        style={{backgroundColor: theme.background}}>
-        <View
-          className='flex-1 flex-col h-full'
-          style={{
-            backgroundColor: theme.background,
-          }}>
-          <Text className='text-2xl p-4 font-bold' style={{
-            color: theme.primary,
-          }}>
-            {category.name}
-          </Text>
-          <View
-            className='gap-2 flex-1 flex-row w-full flex-wrap justify-center items-center'
-          > 
-            {categories.map((cat) => {
-              var flag = cat.name.split(' ')[0];
-              var name = cat.name.split(' ').slice(1).join(' ');
-              if (flag.length < 2) {
-                flag = cat.name.split(' ')[1];
-                name = cat.name.split(' ').slice(2).join(' ');
-              }
-              flag = getFlagEmoji(flag);
-              return (
-                
-                <Card
-                  key={cat.id}
-                  style={{backgroundColor: theme.card}}
-                  className={'rounded-lg w-44 h-[17rem] relative flex flex-col'}
-                  onPress={async () => {
-                    const videoUrl = await buildURL(MediaType.MOVIE, cat.stream_id, cat.extension);
-                    navigation.navigate('Player', {url: videoUrl});
-                  }}
-                  >
-                  <View>
-                    <Card.Title className='flex-initial' title={cat.name} titleStyle={{color: theme.text, fontSize: 12, marginVertical: 10}} titleNumberOfLines={1}/>
-                  </View>
-                  <View className='items-center'>
-                    <Card.Cover
-                      source={{uri: cat.stream_icon != "" ? cat.stream_icon : 'https://cdn.dribbble.com/users/2639810/screenshots/9403030/media/d1c8b21cbd1972075ea236b1953f884f.jpg'}} 
-                      style={{resizeMode: 'stretch', width: 130, height: 172, borderRadius: 6, justifyContent: 'center', position: 'relative', marginTop: 4}}
-                      resizeMethod='auto'
-                      />
-                  </View>
-                </Card>
-                // <Card
-                //   key={cat.id}
-                //   style={{backgroundColor: theme.card}}
-                //   className={'rounded-lg w-4/12 h-48 flex flex-row '}
-                //   onPress={async () => {
-                //     const videoUrl = await buildURL(MediaType.MOVIE, cat.stream_id, cat.extension);
-                //     navigation.navigate('Player', {url: videoUrl});
-                //   }}
-                // >
-                //   {cat.stream_icon == "" ? (
-                //       null
-                //   ) : (
-                //     <Card.Cover
-                //       source={{uri: cat.stream_icon}}
-                //       style={{resizeMode: 'stretch'}}
-                //     />
-                //   )}
-                //   <Card.Title className='flex-initial m-2'>
-                //     <Text key={cat.id} style={{color: theme.text}} className='flex-initial mr-2'>
-                //       {flag} {name}
-                //     </Text>
-                //   </Card.Title>
-                // </Card>
-              );
-            })}
-          </View>
+    <SafeAreaView className='h-full flex ' style={{ backgroundColor: theme.background }}>
+      <Text className='text-2xl p-4 font-bold' style={{
+        color: theme.primary,
+      }}>
+        {category.name}
+      </Text>
+      {loading ? (
+        <View className='flex-1 pb-4 items-center justify-center align-middle'>
+          <ActivityIndicator size="large" color={theme.primary} />
         </View>
-      </ScrollView>
+      ) : (
+        <FlatList
+          key={numColumns}
+          numColumns={numColumns}
+          data={visibleCategories}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id.toString()}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
+          columnWrapperStyle={{ gap: 4 }}
+          contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', gap: 4}}
+        />
+      )}
     </SafeAreaView>
   );
 }
+
 export default MoviesCategoryScreen;
