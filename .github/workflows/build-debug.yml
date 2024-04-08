@@ -42,15 +42,31 @@ jobs:
       - name: Build APK
         run: cd android && ./gradlew assembleDebug && cd ..
 
+      - name: Rename APK
+        run: mv android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/IPTX-$(date +'%Y-%m-%d-%H-%M-%S').apk
+
       - name: Upload APK as artifact
         uses: actions/upload-artifact@v2
         with:
           name: app-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
-          
-      - name: Releasing using Hub
-        uses: ShaunLWM/action-release-debugapk@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
-          APP_FOLDER: app
-          RELEASE_TITLE: New Build
+
+
+      - name: Generate release tag
+        id: generate_release_tag
+        uses: alexvingg/next-release-tag@v1.0.3
+        with:
+          github_token: ${{ secrets.TOKEN }}
+          tag_prefix: ''
+
+      - name: Upload built APK to GitHub Releases
+        uses: softprops/action-gh-release@v1
+        with:
+          files: android/app/build/outputs/apk/debug/app-debug.apk
+          token: ${{ secrets.TOKEN }}
+          release_name: Release ${{ steps.generate_release_tag.outputs.release_tag }}
+          body: 'Built APK for the latest commit on the default branch.'
+          draft: false
+          prerelease: false
+          # set it to date time          
+          tag_name: ${{ steps.generate_release_tag.outputs.release_tag }}
