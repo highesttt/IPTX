@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -12,26 +13,42 @@ import {
 import { getMaterialYouCurrentTheme } from '../utils/theme';
 import { retrieveUser } from '../utils/retrieveInfo';
 import { UserDTO } from '../dto/user.dto';
-import { storeData } from '../utils/data';
+import { retrieveData, storeData } from '../utils/data';
+import SelectDropdown from 'react-native-select-dropdown';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { ProfileDTO } from '../dto/profile.dto';
 
 function ProfileScreen(): React.JSX.Element {
   const [user, setUser] = useState<UserDTO | null>();
   const isDarkMode = useColorScheme() === 'dark';
+  const [profiles, setProfiles] = useState<ProfileDTO[]>([]);
 
   const theme = getMaterialYouCurrentTheme(isDarkMode);
 
-  retrieveUser().then((data) => {
-    if (user === undefined) {
+  useEffect(() => {
+    retrieveUser().then((data) => {
       setUser(data);
-      return;
-    } else {
-      console.log('User already loaded');
-    }
-  });
+    });
+    
+    retrieveData("profiles").then((data) => {
+      if (data === null || data.length === 0) {
+        setSelectedProfile(-1);
+        return;
+      }
+      setProfiles(JSON.parse(data || "[]"));
+      retrieveData("name").then((data) => {
+        var name = JSON.parse(data || "[]");
+        var profile = profiles.findIndex((profile) => profile.name === name);
+        setSelectedProfile(profile);
+      })
+    });
+  }, []);
 
   const backgroundColor = theme.textColored + '50';
 
   const [input, setInput] = useState<string>('');
+  const [NameInput, setNameInput] = useState<string>('');
+  const [selectedProfile, setSelectedProfile] = useState<number>(-1);
 
 
   return (
@@ -86,10 +103,65 @@ function ProfileScreen(): React.JSX.Element {
               </Text>
             </View>
           </View>
+          <View className='flex-1 flex-col justify-center items-center w-full pt-8'>
+            <SelectDropdown
+              data={profiles}
+              onSelect={(selectedItem, index) => {
+                setSelectedProfile(index);
+                storeData("name", selectedItem.name);
+                storeData("username", selectedItem.username);
+                storeData("password", selectedItem.password);
+                storeData("url", selectedItem.url);
+                
+                retrieveUser().then((data) => {
+                  setUser(data);
+                });
+
+              }}
+              renderButton={(selectedItem, isOpened) => {
+                return (
+                  <View className='w-10/12 h-12 justify-center items-center px-3 flex flex-row rounded-lg ' style={{backgroundColor: theme.card}}>
+                    <Text numberOfLines={1} ellipsizeMode="tail" className='text-lg font-semibold flex-1' style={{color: theme.text}}>
+                      {selectedProfile === -1 ? 'Select Profile' : profiles[selectedProfile]?.name}
+                    </Text>
+                    <Icon name={isOpened ? 'chevron-up' : 'chevron-down'} style={{ color: theme.secondary, fontSize: 24 }} />
+                  </View>
+                );
+              }}
+              renderItem={(item, index, isSelected) => {
+                return (
+                  <View className='items-center'>
+                    <View className='h-12 justify-center items-center px-3 flex flex-row rounded-lg' style={{backgroundColor: theme.card}}>
+                      <Text numberOfLines={1} ellipsizeMode="tail" className='text-lg flex-1 font-semibold'>{item?.name}</Text>
+                      <Icon name={selectedProfile === index ? 'check' : 'checkbox-blank-outline'} style={{ color: theme.secondary, fontSize: 24 }} />
+                    </View>
+                    {(index !== profiles.length - 1) && (
+                      <View className='h-0.5 w-11/12' style={{backgroundColor: theme.primary}}></View>
+                    )}
+                  </View>
+                );
+              }}
+              showsVerticalScrollIndicator={false}
+              dropdownStyle={{backgroundColor: theme.card, borderRadius: 8}}
+            />
+          </View>
           <View 
-            className='flex-1 flex-col justify-center items-center w-full pt-6'
+            className='flex-1 flex-col justify-center items-center w-full'
           >
-          <View className='w-10/12 m-2 justify-center flex flex-col gap-3'>
+          <View className='w-10/12 m-2 pt-2 justify-center flex flex-col gap-3'>
+            <View className='rounded-lg'>
+              <TextInput
+                className='w-full p-2 rounded-lg'
+                autoCorrect={false}
+                style={{
+                  backgroundColor: theme.card,
+                  color: theme.text,
+                }}
+                placeholderTextColor={theme.text}
+                placeholder='New Profile Name'
+                onChangeText={text => setNameInput(text)}
+              />
+            </View>
             <View className='rounded-lg'>
               <TextInput
                 className='w-full p-2 rounded-lg'
@@ -112,6 +184,14 @@ function ProfileScreen(): React.JSX.Element {
                 if (splitURL.length < 2) {
                   return;
                 }
+
+                if (!splitURL[1].includes("username=") || !splitURL[1].includes("password=")) {
+                  return;
+                }
+
+                if (NameInput === "") {
+                  return;
+                }
       
                 const searchParams = splitURL[1].split("&").reduce((acc: { [key: string]: any }, cur) => {
                   const [key, value] = cur.split("=");
@@ -121,6 +201,8 @@ function ProfileScreen(): React.JSX.Element {
       
                 const username = searchParams["username"];
                 const password = searchParams["password"];
+
+                await storeData("name", NameInput);
       
                 await storeData("username", username);
                 await storeData("password", password);
@@ -130,12 +212,32 @@ function ProfileScreen(): React.JSX.Element {
       
                 await storeData("url", url);
 
+                const usersData = await retrieveData("users");
+                var users = usersData ? JSON.parse(usersData) : null;
+
+                if (users) {
+                  users++;
+                }
+
+                await storeData("users", users);
+
+                var profile = {
+                  name: NameInput,
+                  url: url,
+                  username: username,
+                  password: password
+                };
+
+                setProfiles([...profiles, profile]);
+                await storeData("profiles", [...profiles, profile]);
+                setSelectedProfile(users);
+
                 retrieveUser().then((data) => {
                   setUser(data);
                 });
               }}
             >
-              <Text style={{color: theme.textColored}}>Submit</Text>
+              <Text style={{color: theme.textColored}}>Add Profile</Text>
             </TouchableOpacity>
           </View>
           </View>
