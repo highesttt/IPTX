@@ -64,7 +64,7 @@ function LiveCategoryScreen({route, navigation}: any): React.JSX.Element {
                   key={cat.id}
                   onPress={async () => {
                     const videoUrl = await buildURL(MediaType.LIVE, cat.stream_id);
-                    navigation.navigate('Player', {url: videoUrl});
+                    navigation.push('Player', {url: videoUrl});
                   }}
                 >
                 {cat.stream_icon != "" ? (

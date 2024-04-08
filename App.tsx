@@ -22,6 +22,7 @@ import LiveCategoryScreen from './screens/LiveCategory.tsx';
 import PlayerScreen from './screens/Player.tsx';
 import { useDeviceOrientation } from '@react-native-community/hooks';
 import MoviesCategoryScreen from './screens/MoviesCategory.tsx';
+import MoviesViewScreen from './screens/MoviesView.tsx';
 import ProfileScreen from './screens/Profile.tsx';
 
 const Tab = createMaterialBottomTabNavigator();
@@ -52,6 +53,7 @@ function MoviesStackScreen() {
       }}>
       <Stack.Screen name="Streams" component={MoviesScreen} />
       <Stack.Screen name="Category" component={MoviesCategoryScreen} />
+      <Stack.Screen name="View" component={MoviesViewScreen} />
       <Stack.Screen name="Player" component={PlayerScreen} />
     </Stack.Navigator>
   );

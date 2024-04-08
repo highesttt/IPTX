@@ -56,12 +56,7 @@ function MoviesCategoryScreen({ route, navigation }: any): React.JSX.Element {
         style={{ backgroundColor: theme.card }}
         className={'rounded-lg w-44 h-[17rem] relative flex flex-col'}
         onPress={async () => {
-          const videoUrl = await buildURL(
-            MediaType.MOVIE,
-            item.stream_id,
-            item.extension
-          );
-          navigation.navigate('Player', { url: videoUrl });
+          navigation.push('View', { movie: item });
         }}>
         <View>
           <Card.Title

@@ -2,6 +2,8 @@ import { CategoryDTO } from "../dto/category.dto";
 import { LiveDTO } from "../dto/media/live.dto";
 import { MovieDTO } from "../dto/media/movie.dto";
 import { SeriesDTO } from "../dto/media/series.dto";
+import { MovieInfoDTO } from "../dto/media_info/movie_info.dto";
+import { SeriesInfoDTO } from "../dto/media_info/series_info.dto";
 import { UserDTO } from "../dto/user.dto";
 import { MediaType } from "./MediaType";
 import { Action, buildAPIURL } from "./buildUrl";
@@ -86,7 +88,7 @@ export async function retrieveMediaInfo(type: MediaType, id: string) {
         }
         return await fetch(url)
             .then((response) => response.json())
-            .then((data) => new MovieDTO(data));
+            .then((data) => new MovieInfoDTO(data));
     } else if (type === MediaType.SERIES) {
         const url = await buildAPIURL(Action.GET_SERIES_INFO, id);
         if (url === null) {
@@ -94,7 +96,7 @@ export async function retrieveMediaInfo(type: MediaType, id: string) {
         }
         return await fetch(url)
             .then((response) => response.json())
-            .then((data) => new SeriesDTO(data));
+            .then((data) => new SeriesInfoDTO(data));
     }
 
     return null;

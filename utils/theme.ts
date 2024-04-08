@@ -14,6 +14,7 @@ function generateTheme(palette: MaterialYouPalette) {
     background: palette.system_neutral1[1], // shade 10
     card: palette.system_accent2[2], // shade 50
     icon: palette.system_accent1[10], // shade 800
+    secondary: palette.system_accent1[5], // shade 300
   };
   const dark: typeof light = {
     isDark: true,
@@ -23,6 +24,7 @@ function generateTheme(palette: MaterialYouPalette) {
     background: palette.system_neutral1[11], // shade 900
     card: palette.system_accent2[10], // shade 800
     icon: palette.system_accent1[3], // shade 100
+    secondary: palette.system_accent1[6], // shade 400
   };
   return { light, dark };
 }
@@ -42,6 +44,7 @@ export const getMaterialYouCurrentTheme = (isDarkMode: boolean) => {
     textColored: isDarkMode ? styles.dark.textColored : styles.light.textColored,
     card: isDarkMode ? styles.dark.card : styles.light.card,
     icon: isDarkMode ? styles.dark.icon : styles.light.icon,
+    secondary: isDarkMode ? styles.dark.secondary : styles.light.secondary,
   };
 
   return style;

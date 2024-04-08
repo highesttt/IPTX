@@ -131,12 +131,7 @@ function ProfileScreen(): React.JSX.Element {
                 await storeData("url", url);
 
                 retrieveUser().then((data) => {
-                  if (user === undefined) {
-                    setUser(data);
-                    return;
-                  } else {
-                    console.log('User already loaded');
-                  }
+                  setUser(data);
                 });
               }}
             >
