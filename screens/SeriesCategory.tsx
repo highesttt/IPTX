@@ -15,19 +15,20 @@ import { MediaType } from '../utils/MediaType';
 import { getFlagEmoji } from '../utils/flagEmoji';
 import { MovieDTO } from '../dto/media/movie.dto';
 import { Card } from 'react-native-paper';
+import { SeriesDTO } from '../dto/media/series.dto';
 
-function MoviesCategoryScreen({ route, navigation }: any): React.JSX.Element {
-  const [categories, setCategories] = useState<MovieDTO[]>([]);
+function SeriesCategoryScreen({ route, navigation }: any): React.JSX.Element {
+  const [categories, setCategories] = useState<SeriesDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const isDarkMode = useColorScheme() === 'dark';
   const { category } = route.params;
-  const [visibleCategories, setVisibleCategories] = useState<MovieDTO[]>([]);
+  const [visibleCategories, setVisibleCategories] = useState<SeriesDTO[]>([]);
   const CHUNK_SIZE = 30;
 
   const theme = getMaterialYouCurrentTheme(isDarkMode);
 
   useEffect(() => {
-    retrieveCategoryInfo(MediaType.MOVIE, category.id).then((data) => {
+    retrieveCategoryInfo(MediaType.SERIES, category.id).then((data) => {
       setCategories(data);
       setVisibleCategories(data.slice(0, CHUNK_SIZE));
       setLoading(false);
@@ -40,7 +41,7 @@ function MoviesCategoryScreen({ route, navigation }: any): React.JSX.Element {
     setVisibleCategories([...visibleCategories, ...nextChunk]);
   };
 
-  const renderItem = ({ item }: { item: MovieDTO }) => {
+  const renderItem = ({ item }: { item: SeriesDTO }) => {
     var flag = item.name.split(' ')[0];
     var name = item.name.split(' ').slice(1).join(' ');
     if (flag.length < 2) {
@@ -53,10 +54,7 @@ function MoviesCategoryScreen({ route, navigation }: any): React.JSX.Element {
       <Card
         key={item.id}
         style={{ backgroundColor: theme.card }}
-        className={'rounded-lg w-44 h-[17rem] relative flex flex-col'}
-        onPress={async () => {
-          navigation.push('View', { movie: item });
-        }}>
+        className={'rounded-lg w-44 h-[17rem] relative flex flex-col'}>
         <View>
           <Card.Title
             className="flex-initial"
@@ -125,4 +123,4 @@ function MoviesCategoryScreen({ route, navigation }: any): React.JSX.Element {
   );
 }
 
-export default MoviesCategoryScreen;
+export default SeriesCategoryScreen;

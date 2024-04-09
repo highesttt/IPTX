@@ -14,6 +14,7 @@ import { MediaType } from '../utils/MediaType';
 import { getFlagEmoji } from '../utils/flagEmoji';
 import { LiveDTO } from '../dto/media/live.dto';
 import { buildURL } from '../utils/buildUrl';
+import { globalVars } from '../App';
 import FitImage from 'react-native-fit-image';
 
 function LiveCategoryScreen({route, navigation}: any): React.JSX.Element {
@@ -64,6 +65,7 @@ function LiveCategoryScreen({route, navigation}: any): React.JSX.Element {
                   key={cat.id}
                   onPress={async () => {
                     const videoUrl = await buildURL(MediaType.LIVE, cat.stream_id);
+                    globalVars.isPlayer = true;
                     navigation.push('Player', {url: videoUrl});
                   }}
                 >

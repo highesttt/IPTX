@@ -1,0 +1,83 @@
+diff --git a/node_modules/react-native-paper/src/components/BottomNavigation/BottomNavigation.tsx b/node_modules/react-native-paper/src/components/BottomNavigation/BottomNavigation.tsx
+index d6485bb..91690eb 100644
+--- a/node_modules/react-native-paper/src/components/BottomNavigation/BottomNavigation.tsx
++++ b/node_modules/react-native-paper/src/components/BottomNavigation/BottomNavigation.tsx
+@@ -11,6 +11,7 @@ import {
+ } from 'react-native';
+ 
+ import useLatestCallback from 'use-latest-callback';
++import { globalVars } from '../../../../../App';
+ 
+ import BottomNavigationBar from './BottomNavigationBar';
+ import BottomNavigationRouteScreen from './BottomNavigationRouteScreen';
+@@ -488,6 +489,9 @@ const BottomNavigation = <Route extends BaseRoute>({
+   const { routes } = navigationState;
+   const { colors } = theme;
+ 
++  // check if the current view is a player
++  
++
+   return (
+     <View style={[styles.container, style]} testID={testID}>
+       <View style={[styles.content, { backgroundColor: colors?.background }]}>
+@@ -570,32 +574,34 @@ const BottomNavigation = <Route extends BaseRoute>({
+           );
+         })}
+       </View>
+-      <BottomNavigationBar
+-        navigationState={navigationState}
+-        renderIcon={renderIcon}
+-        renderLabel={renderLabel}
+-        renderTouchable={renderTouchable}
+-        getLabelText={getLabelText}
+-        getBadge={getBadge}
+-        getColor={getColor}
+-        getAccessibilityLabel={getAccessibilityLabel}
+-        getTestID={getTestID}
+-        activeColor={activeColor}
+-        inactiveColor={inactiveColor}
+-        keyboardHidesNavigationBar={keyboardHidesNavigationBar}
+-        style={barStyle}
+-        activeIndicatorStyle={activeIndicatorStyle}
+-        labeled={labeled}
+-        animationEasing={sceneAnimationEasing}
+-        onTabPress={handleTabPress}
+-        onTabLongPress={onTabLongPress}
+-        shifting={shifting}
+-        safeAreaInsets={safeAreaInsets}
+-        labelMaxFontSizeMultiplier={labelMaxFontSizeMultiplier}
+-        compact={compact}
+-        testID={`${testID}-bar`}
+-        theme={theme}
+-      />
++      { globalVars.isPlayer == true ? null : 
++        <BottomNavigationBar
++          navigationState={navigationState}
++          renderIcon={renderIcon}
++          renderLabel={renderLabel}
++          renderTouchable={renderTouchable}
++          getLabelText={getLabelText}
++          getBadge={getBadge}
++          getColor={getColor}
++          getAccessibilityLabel={getAccessibilityLabel}
++          getTestID={getTestID}
++          activeColor={activeColor}
++          inactiveColor={inactiveColor}
++          keyboardHidesNavigationBar={keyboardHidesNavigationBar}
++          style={barStyle}
++          activeIndicatorStyle={activeIndicatorStyle}
++          labeled={labeled}
++          animationEasing={sceneAnimationEasing}
++          onTabPress={handleTabPress}
++          onTabLongPress={onTabLongPress}
++          shifting={shifting}
++          safeAreaInsets={safeAreaInsets}
++          labelMaxFontSizeMultiplier={labelMaxFontSizeMultiplier}
++          compact={compact}
++          testID={`${testID}-bar`}
++          theme={theme}
++        />
++      }
+     </View>
+   );
+ };

@@ -4,16 +4,22 @@ import Video from "react-native-video";
 import { useState } from "react";
 import { AudioTrackDTO } from "../dto/audioTrack.dto";
 import { SubtitleTrackDTO } from "../dto/subtitleTrack.dto";
+import { globalVars } from '../App';
 
 function PlayerScreen({route, navigation}: any) {
 
   const [AudioTracks, setAudioTracks] = useState<AudioTrackDTO[]>([]);
   const [Subtitles, setSubtitles] = useState<SubtitleTrackDTO[]>([]);
   const {url} = route.params;
-  var player = null;
+  var player: any = null;
 
   const isDarkMode = useColorScheme() === 'dark';
   const theme = getMaterialYouCurrentTheme(isDarkMode);
+
+  // when the user presses the back button on android
+  navigation.addListener('beforeRemove', (e: any) => {
+    globalVars.isPlayer = false;
+  });
 
   return (
     <View className="">

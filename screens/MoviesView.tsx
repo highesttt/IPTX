@@ -4,21 +4,18 @@ import {
   Text,
   useColorScheme,
   View,
-  ActivityIndicator,
-  FlatList,
-  useWindowDimensions,
   ImageBackground,
   Linking,
 } from 'react-native';
 
 import { getMaterialYouCurrentTheme } from '../utils/theme';
-import { retrieveCategoryInfo, retrieveMediaInfo } from '../utils/retrieveInfo';
+import { retrieveMediaInfo } from '../utils/retrieveInfo';
 import { MediaType } from '../utils/MediaType';
-import { getFlagEmoji } from '../utils/flagEmoji';
 import { buildURL } from '../utils/buildUrl';
 import { MovieDTO } from '../dto/media/movie.dto';
-import { Button, Card } from 'react-native-paper';
+import { Button } from 'react-native-paper';
 import { MovieInfoDTO } from '../dto/media_info/movie_info.dto';
+import { globalVars } from '../App';
 
 function MoviesCategoryScreen({ route, navigation }: any): React.JSX.Element {
   const [movieInfo, setMovieInfo] = useState<MovieInfoDTO>();
@@ -75,6 +72,7 @@ function MoviesCategoryScreen({ route, navigation }: any): React.JSX.Element {
               className='rounded-lg p-2 w-5/12 flex-1'
               onPress={async () => {
                 const videoUrl = await buildURL(MediaType.MOVIE, movie.stream_id, movie.extension);
+                globalVars.isPlayer = true;
                 navigation.navigate('Player', { url: videoUrl });
               }}>
               <Text style={{ color: theme.primary }}>Play</Text>

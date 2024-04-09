@@ -14,7 +14,7 @@ import { retrieveCategories } from '../utils/retrieveInfo';
 import { MediaType } from '../utils/MediaType';
 import { getFlagEmoji } from '../utils/flagEmoji';
 
-function SeriesScreen(): React.JSX.Element {
+function SeriesScreen({navigation}: any): React.JSX.Element {
   const [categories, setCategories] = useState<CategoryDTO[]>([]);
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -52,7 +52,12 @@ function SeriesScreen(): React.JSX.Element {
               return (
                 <TouchableOpacity className='rounded-lg w-10/12 h-10 m-2 flex justify-center items-center transition-all duration-500'
                   style={{backgroundColor: theme.card}}
-                  key={category.id}>
+                  key={category.id}
+                  onPress={() =>
+                    navigation.push('Category', {
+                      category: category,
+                    })
+                  }>
                   <Text key={category.id} style={{color: theme.text}}>
                     {flag} {name}
                   </Text>

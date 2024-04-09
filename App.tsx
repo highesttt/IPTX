@@ -24,8 +24,13 @@ import { useDeviceOrientation } from '@react-native-community/hooks';
 import MoviesCategoryScreen from './screens/MoviesCategory.tsx';
 import MoviesViewScreen from './screens/MoviesView.tsx';
 import ProfileScreen from './screens/Profile.tsx';
+import SeriesCategoryScreen from './screens/SeriesCategory.tsx';
 
 const Tab = createMaterialBottomTabNavigator();
+
+export var globalVars = {
+  isPlayer: false
+}
 
 function LiveStackScreen() {
   const Stack = createNativeStackNavigator();
@@ -58,10 +63,25 @@ function MoviesStackScreen() {
     </Stack.Navigator>
   );
 }
+function SeriesStackScreen() {
+  const Stack = createNativeStackNavigator();
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        animation: 'simple_push',
+        contentStyle: {backgroundColor: 'transparent'},
+      }}>
+      <Stack.Screen name="Streams" component={SeriesScreen} />
+      <Stack.Screen name="Category" component={SeriesCategoryScreen} />
+      <Stack.Screen name="View" component={MoviesViewScreen} />
+      <Stack.Screen name="Player" component={PlayerScreen} />
+    </Stack.Navigator>
+  );
+}
 
 function App(): React.JSX.Element {
-  var orientation = useDeviceOrientation()
-
+  // var orientation = useDeviceOrientation()
 
   const isDarkMode = useColorScheme() === 'dark';
   const style = getMaterialYouCurrentTheme(isDarkMode)
@@ -77,9 +97,10 @@ function App(): React.JSX.Element {
             initialRouteName="Live"
             activeColor={style.primary}
             inactiveColor={style.text}
+            
             barStyle={{
               backgroundColor: style.background,
-              display: orientation == 'landscape' ? 'none' : 'flex',
+              // display: orientation == 'landscape' ? 'none' : 'flex',
             }}
             theme={{
               dark: isDarkMode,
@@ -116,7 +137,7 @@ function App(): React.JSX.Element {
             />
             <Tab.Screen
               name="Series"
-              component={SeriesScreen}
+              component={SeriesStackScreen}
               options={{
                 tabBarIcon: ({ color }) => (
                   <MaterialCommunityIcons name="television-classic" color={color} size={24} />
