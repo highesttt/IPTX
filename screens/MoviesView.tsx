@@ -49,7 +49,7 @@ function MoviesViewScreen({ route, navigation }: any): React.JSX.Element {
             <Text style={{ color: theme.primary }} className='text-xl'>•</Text>
             <Text style={{ color: theme.text}} className='text-lg'>TMDb  {movie.rating}/10</Text>
             <Text style={{ color: theme.primary }} className='text-xl'>•</Text>
-            <Text style={{ color: theme.text }} className='text-lg'>{movieInfo?.release_date.split('-')[0]}</Text>
+            <Text style={{ color: theme.text }} className='text-lg'>{movieInfo?.release_date?.split('-')[0]}</Text>
           </View>
 
           <Text style={{ color: theme.secondary }} className='pb-1 font-extrabold text-xl w-11/12'>Plot</Text>

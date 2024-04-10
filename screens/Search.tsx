@@ -62,11 +62,16 @@ function SearchScreen({navigation}: any): React.JSX.Element {
     // Call your search function when the input changes
     
       const filteredSeries = series.filter((item) =>
-        item.name.toLowerCase().includes(input.toLowerCase())
+        item.name?.toLowerCase().includes(input.toLowerCase()) ||
+        item.cast?.toLowerCase().includes(input.toLowerCase()) ||
+        item.director?.toLowerCase().includes(input.toLowerCase()) ||
+        item.genre?.toLowerCase().includes(input.toLowerCase()) ||
+        item.tmdb?.toLowerCase().includes(input.toLowerCase()) ||
+        item.plot?.toLowerCase().includes(input.toLowerCase())
       );
 
       const filteredMovies = movies.filter((item) =>
-        item.name.toLowerCase().includes(input.toLowerCase())
+        item.name?.toLowerCase().includes(input.toLowerCase())
       );
 
       setSearchResults([...filteredSeries, ...filteredMovies]);
