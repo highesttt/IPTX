@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -13,21 +13,33 @@ import { retrieveCategories } from '../utils/retrieveInfo';
 import { MediaType } from '../utils/MediaType';
 import { CategoryDTO } from '../dto/category.dto';
 import { getFlagEmoji } from '../utils/flagEmoji';
+import { useIsFocused } from '@react-navigation/native';
+import { retrieveData } from '../utils/data';
 
 function MoviesScreen({navigation}: any): React.JSX.Element {
   const [categories, setCategories] = useState<CategoryDTO[]>([]);
+  const [profile, setProfile] = useState<string | null>('');
   const isDarkMode = useColorScheme() === 'dark';
 
   const theme = getMaterialYouCurrentTheme(isDarkMode);
 
-  retrieveCategories(MediaType.MOVIE).then((data) => {
-    if (categories.length === 0) {
-      setCategories(data);
-      return;
-    } else {
-      console.log('Categories already loaded');
-    }
-  });
+  const focused = useIsFocused();
+
+  useEffect(() => {
+    retrieveData('name').then((name) => {
+      if (categories.length === 0 || name !== profile) {
+        setCategories([]);
+        setProfile(name);
+        retrieveCategories(MediaType.MOVIE).then((data) => {
+            setCategories(data);
+            return;
+        });
+      } else {
+        console.log('Categories already loaded');
+      }
+    })
+  }, [focused]);
+  
 
   return (
     <SafeAreaView style={{backgroundColor: theme.background}}>

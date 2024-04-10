@@ -17,8 +17,9 @@ import { retrieveData, storeData } from '../utils/data';
 import SelectDropdown from 'react-native-select-dropdown';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ProfileDTO } from '../dto/profile.dto';
+import { StackActions } from '@react-navigation/native';
 
-function ProfileScreen(): React.JSX.Element {
+function ProfileScreen({navigation}: any): React.JSX.Element {
   const [user, setUser] = useState<UserDTO | null>();
   const isDarkMode = useColorScheme() === 'dark';
   const [profiles, setProfiles] = useState<ProfileDTO[]>([]);
@@ -116,7 +117,6 @@ function ProfileScreen(): React.JSX.Element {
                 retrieveUser().then((data) => {
                   setUser(data);
                 });
-
               }}
               renderButton={(selectedItem, isOpened) => {
                 return (

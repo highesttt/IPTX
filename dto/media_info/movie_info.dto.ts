@@ -10,5 +10,6 @@ export class MovieInfoDTO extends MediaInfoDTO {
         const hours = Math.floor(data.info.duration_secs / 3600);
         const minutes = Math.floor((data.info.duration_secs - hours * 3600) / 60);
         this.duration = hours + 'h ' + minutes + 'm';
+        this.background = data.info.backdrop_path[0] ? data.info.backdrop_path[0] : data.info.cover_big;
     }
 }

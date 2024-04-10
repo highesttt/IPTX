@@ -13,12 +13,14 @@ import { getMaterialYouCurrentTheme } from '../utils/theme';
 import { retrieveCategoryInfo } from '../utils/retrieveInfo';
 import { MediaType } from '../utils/MediaType';
 import { getFlagEmoji } from '../utils/flagEmoji';
-import { MovieDTO } from '../dto/media/movie.dto';
 import { Card } from 'react-native-paper';
 import { SeriesDTO } from '../dto/media/series.dto';
+import { useIsFocused } from '@react-navigation/native';
+import { retrieveData } from '../utils/data';
 
 function SeriesCategoryScreen({ route, navigation }: any): React.JSX.Element {
   const [categories, setCategories] = useState<SeriesDTO[]>([]);
+  const [profile, setProfile] = useState<string | null>('');
   const [loading, setLoading] = useState(true);
   const isDarkMode = useColorScheme() === 'dark';
   const { category } = route.params;
@@ -27,14 +29,24 @@ function SeriesCategoryScreen({ route, navigation }: any): React.JSX.Element {
 
   const theme = getMaterialYouCurrentTheme(isDarkMode);
 
-  useEffect(() => {
-    retrieveCategoryInfo(MediaType.SERIES, category.id).then((data) => {
-      setCategories(data);
-      setVisibleCategories(data.slice(0, CHUNK_SIZE));
-      setLoading(false);
-    });
-  }, []);
+  const focused = useIsFocused();
 
+  useEffect(() => {
+    retrieveData('name').then((name) => {
+      if (categories.length === 0 || name !== profile) {
+        setCategories([]);
+        setProfile(name);
+        retrieveCategoryInfo(MediaType.SERIES, category.id).then((data) => {
+            setCategories(data);
+            setVisibleCategories(data.slice(0, CHUNK_SIZE));
+            setLoading(false);
+            return;
+        });
+      } else {
+        console.log('Categories already loaded');
+      }
+    })
+  }, [focused]);
   const handleLoadMore = () => {
     const currentLength = visibleCategories.length;
     const nextChunk = categories.slice(currentLength, currentLength + CHUNK_SIZE);
@@ -54,7 +66,10 @@ function SeriesCategoryScreen({ route, navigation }: any): React.JSX.Element {
       <Card
         key={item.id}
         style={{ backgroundColor: theme.card }}
-        className={'rounded-lg w-44 h-[17rem] relative flex flex-col'}>
+        className={'rounded-lg w-44 h-[17rem] relative flex flex-col'}
+        onPress={async () => {
+          navigation.push('View', { series: item });
+        }}>
         <View>
           <Card.Title
             className="flex-initial"

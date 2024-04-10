@@ -10,5 +10,8 @@ export class SeriesInfoDTO extends MediaInfoDTO {
                 return new EpisodeDTO(episode, parseInt(season));
             });
         })
+        this.release_date = data.info.releaseDate;
+        this.background = data.info.backdrop_path[0] ? data.info.backdrop_path[0] : data.seasons[0].cover_tmdb;
+        this.tmdb_id = data.info.tmdb;
     }
 }

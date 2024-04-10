@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -13,22 +13,33 @@ import { retrieveCategories } from '../utils/retrieveInfo';
 import { MediaType } from '../utils/MediaType';
 import { CategoryDTO } from '../dto/category.dto';
 import { getFlagEmoji } from '../utils/flagEmoji';
+import { retrieveData } from '../utils/data';
+import { useIsFocused } from '@react-navigation/native';
 
 function LiveScreen({navigation}: any): React.JSX.Element {
   const [categories, setCategories] = useState<CategoryDTO[]>([]);
+  const [profile, setProfile] = useState<string | null>('');
   const isDarkMode = useColorScheme() === 'dark';
 
   const theme = getMaterialYouCurrentTheme(isDarkMode);
 
-  retrieveCategories(MediaType.LIVE).then((data) => {
-    if (categories.length === 0) {
-      setCategories(data);
-      return;
-    } else {
-      console.log('Categories already loaded');
-    }
-  });
+  const focused = useIsFocused();
 
+  useEffect(() => {
+    retrieveData('name').then((name) => {
+      if (categories.length === 0 || name !== profile) {
+        setCategories([]);
+        setProfile(name);
+        retrieveCategories(MediaType.LIVE).then((data) => {
+            setCategories(data);
+            return;
+        });
+      } else {
+        console.log('Categories already loaded');
+      }
+    })
+  }, [focused]);
+  
   return (
     <SafeAreaView style={{backgroundColor: theme.background}}>
       <ScrollView
@@ -51,7 +62,7 @@ function LiveScreen({navigation}: any): React.JSX.Element {
               var name = category.name.split(' ').slice(1).join(' ');
               return (
                 <TouchableOpacity
-                className='rounded-lg w-10/12 h-10 m-2 flex justify-center items-center transition-all duration-500'
+                className='rounded-lg w-10/12 h-10 m-2 p-2 flex justify-center items-center transition-all duration-500'
                   style={{backgroundColor: theme.card}}
                   key={category.id}
                   onPress={() =>

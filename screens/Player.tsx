@@ -33,13 +33,13 @@ function PlayerScreen({route, navigation}: any) {
         controls
         resizeMode="contain"
         style={{ width: "100%", height: "100%" }}
-        onLoad={(data) => {
+        onLoad={(data: any) => {
           const audioTracks = data.audioTracks;
           var subtitles = data.textTracks;
-          setSubtitles(subtitles.map((sub) => {
+          setSubtitles(subtitles.map((sub: any) => {
             return new SubtitleTrackDTO(sub);
           }));
-          setAudioTracks(audioTracks.map((audio) => {
+          setAudioTracks(audioTracks.map((audio: any) => {
             return new AudioTrackDTO(audio);
           }));
         }}

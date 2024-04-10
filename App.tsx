@@ -25,6 +25,7 @@ import MoviesCategoryScreen from './screens/MoviesCategory.tsx';
 import MoviesViewScreen from './screens/MoviesView.tsx';
 import ProfileScreen from './screens/Profile.tsx';
 import SeriesCategoryScreen from './screens/SeriesCategory.tsx';
+import SeriesViewScreen from './screens/SeriesView.tsx';
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -74,7 +75,7 @@ function SeriesStackScreen() {
       }}>
       <Stack.Screen name="Streams" component={SeriesScreen} />
       <Stack.Screen name="Category" component={SeriesCategoryScreen} />
-      <Stack.Screen name="View" component={MoviesViewScreen} />
+      <Stack.Screen name="View" component={SeriesViewScreen} />
       <Stack.Screen name="Player" component={PlayerScreen} />
     </Stack.Navigator>
   );

@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
+  FlatList,
   SafeAreaView,
   ScrollView,
   Text,
@@ -16,83 +18,107 @@ import { LiveDTO } from '../dto/media/live.dto';
 import { buildURL } from '../utils/buildUrl';
 import { globalVars } from '../App';
 import FitImage from 'react-native-fit-image';
+import { useIsFocused } from '@react-navigation/native';
+import { retrieveData } from '../utils/data';
 
-function LiveCategoryScreen({route, navigation}: any): React.JSX.Element {
+function LiveCategoryScreen({ route, navigation }: any): React.JSX.Element {
   const [categories, setCategories] = useState<LiveDTO[]>([]);
+  const [profile, setProfile] = useState<string | null>('');
+  const [loading, setLoading] = useState(true);
   const isDarkMode = useColorScheme() === 'dark';
-  const {category} = route.params;
+  const { category } = route.params;
+  const [visibleCategories, setVisibleCategories] = useState<LiveDTO[]>([]);
+  const CHUNK_SIZE = 30;
 
   const theme = getMaterialYouCurrentTheme(isDarkMode);
 
-  retrieveCategoryInfo(MediaType.LIVE, category.id).then((data) => {
-    if (categories.length === 0) {
-      setCategories(data);
-      return;
-    } else {
-      console.log('Categories already loaded');
+  const focused = useIsFocused();
+
+  useEffect(() => {
+    retrieveData('name').then((name) => {
+      if (categories.length === 0 || name !== profile) {
+        setCategories([]);
+        setProfile(name);
+        retrieveCategoryInfo(MediaType.LIVE, category.id).then((data) => {
+            setCategories(data);
+            setVisibleCategories(data.slice(0, CHUNK_SIZE));
+            setLoading(false);
+            return;
+        });
+      } else {
+        console.log('Categories already loaded');
+      }
+    })
+  }, [focused]);
+  
+  const handleLoadMore = () => {
+    const currentLength = visibleCategories.length;
+    const nextChunk = categories.slice(currentLength, currentLength + CHUNK_SIZE);
+    setVisibleCategories([...visibleCategories, ...nextChunk]);
+  };
+
+  const renderItem = ({ item }: { item: LiveDTO }) => {
+    var flag = item.name.split(' ')[0];
+    var name = item.name.split(' ').slice(1).join(' ');
+    if (flag.length < 2) {
+      flag = item.name.split(' ')[1];
+      name = item.name.split(' ').slice(2).join(' ');
     }
-  });
+    flag = getFlagEmoji(flag);
+
+    return (
+      <View className='w-screen justify-center align-middle items-center'>
+        <TouchableOpacity
+        className={
+          "rounded-lg h-16 m-2 flex transition-all duration-500 flex-row justify-start items-center pl-4 w-11/12"
+        }
+        style={{ backgroundColor: theme.card }}
+          onPress={async () => {
+            const videoUrl = await buildURL(MediaType.LIVE, item.stream_id);
+            globalVars.isPlayer = true;
+            navigation.push('Player', { url: videoUrl });
+          }}
+        >
+          {item.stream_icon ? (
+            <FitImage
+              source={{ uri: item.stream_icon }}
+              style={{ width: 30, height: 40, borderRadius: 20, marginRight: 10 }}
+              resizeMode='contain'
+              onError={(e) => {
+                console.log('Error loading image: ', e);}}
+            />
+          ) : null}
+          <Text style={{ color: theme.text }}>{flag} {name}</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   return (
-    <SafeAreaView style={{backgroundColor: theme.background}}>
-      <ScrollView
-        style={{backgroundColor: theme.background}}>
-        <View
-          className='flex-1 flex-col h-full'
-          style={{
-            backgroundColor: theme.background,
-          }}>
-          <Text className='text-2xl p-4 font-bold' style={{
-            color: theme.primary,
-          }}>
-            {category.name}
-          </Text>
-          <View
-          className='flex-1 flex-col justify-center items-center w-full'
-          > 
-            {categories.map((cat) => {
-              var flag = cat.name.split(' ')[0];
-              var name = cat.name.split(' ').slice(1).join(' ');
-              if (flag.length < 2) {
-                flag = cat.name.split(' ')[1];
-                name = cat.name.split(' ').slice(2).join(' ');
-              }
-              flag = getFlagEmoji(flag);
-              return (
-                <TouchableOpacity
-                  className={'rounded-lg w-10/12 h-16 m-2 flex transition-all duration-500 flex-row items-center justify-center'}
-                  style={{backgroundColor: theme.card}}
-                  key={cat.id}
-                  onPress={async () => {
-                    const videoUrl = await buildURL(MediaType.LIVE, cat.stream_id);
-                    globalVars.isPlayer = true;
-                    navigation.push('Player', {url: videoUrl});
-                  }}
-                >
-                {cat.stream_icon != "" ? (
-                  <Text key={cat.id} style={{color: theme.text}} className='flex-initial mr-2'>
-                    {flag} {name}
-                  </Text>
-                ) :
-                <Text key={cat.id} style={{color: theme.text}} className='text-center'>
-                  {flag} {name}
-                </Text>
-              }
-              {cat.stream_icon ? (
-                
-                <FitImage
-                  source={{uri: cat.stream_icon}}
-                  className='h-10 w-10 rounded-lg mx-2 absolute left-2 flex-initial'
-                  resizeMode='cover'
-                />
-              ) : null}
-                </TouchableOpacity>
-              );
-            })}
-          </View>
+    <SafeAreaView style={{ backgroundColor: theme.background }}
+    className="flex-1 flex-col h-full">
+      <Text style={{ color: theme.primary, fontSize: 20, fontWeight: 'bold', padding: 10 }}>
+        {category.name}
+      </Text>
+      {loading ? (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <ActivityIndicator size="large" color={theme.primary} />
         </View>
-      </ScrollView>
+      ) : (
+        <View className="flex-1 flex-col justify-center items-center w-full">
+          <FlatList
+            data={visibleCategories}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id.toString()}
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.5}
+            className='w-full h-full'
+            contentContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}
+          />
+        </View>
+      )}
     </SafeAreaView>
   );
 }
+
 export default LiveCategoryScreen;
