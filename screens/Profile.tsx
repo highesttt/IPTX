@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -17,7 +16,6 @@ import { retrieveData, storeData } from '../utils/data';
 import SelectDropdown from 'react-native-select-dropdown';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ProfileDTO } from '../dto/profile.dto';
-import { StackActions } from '@react-navigation/native';
 
 function ProfileScreen({navigation}: any): React.JSX.Element {
   const [user, setUser] = useState<UserDTO | null>();
@@ -148,98 +146,98 @@ function ProfileScreen({navigation}: any): React.JSX.Element {
           <View 
             className='flex-1 flex-col justify-center items-center w-full'
           >
-          <View className='w-10/12 m-2 pt-2 justify-center flex flex-col gap-3'>
-            <View className='rounded-lg'>
-              <TextInput
-                className='w-full p-2 rounded-lg'
-                autoCorrect={false}
-                style={{
-                  backgroundColor: theme.card,
-                  color: theme.text,
+            <View className='w-10/12 m-2 pt-2 justify-center flex flex-col gap-3'>
+              <View className='rounded-lg'>
+                <TextInput
+                  className='w-full p-2 rounded-lg'
+                  autoCorrect={false}
+                  style={{
+                    backgroundColor: theme.card,
+                    color: theme.text,
+                  }}
+                  placeholderTextColor={theme.secondary}
+                  placeholder='New Profile Name'
+                  onChangeText={text => setNameInput(text)}
+                />
+              </View>
+              <View className='rounded-lg'>
+                <TextInput
+                  className='w-full p-2 rounded-lg'
+                  autoCorrect={false}
+                  style={{
+                    backgroundColor: theme.card,
+                    color: theme.text,
+                  }}
+                  placeholderTextColor={theme.secondary}
+                  placeholder='Your IPTV URL'
+                  onChangeText={text => setInput(text)}
+                />
+              </View>
+              <TouchableOpacity
+                className='rounded-lg w-full p-2 justify-center items-center'
+                style={{backgroundColor: theme.primary}}
+                onPress={async () => {
+                  const splitURL = input.split("?");
+        
+                  if (splitURL.length < 2) {
+                    return;
+                  }
+
+                  if (!splitURL[1].includes("username=") || !splitURL[1].includes("password=")) {
+                    return;
+                  }
+
+                  if (NameInput === "") {
+                    return;
+                  }
+        
+                  const searchParams = splitURL[1].split("&").reduce((acc: { [key: string]: any }, cur) => {
+                    const [key, value] = cur.split("=");
+                    acc[key] = value;
+                    return acc;
+                  }, {});
+        
+                  const username = searchParams["username"];
+                  const password = searchParams["password"];
+
+                  await storeData("name", NameInput);
+        
+                  await storeData("username", username);
+                  await storeData("password", password);
+        
+                  var url: string = splitURL[0];
+                  url = url.substring(0, url.lastIndexOf("/"));
+        
+                  await storeData("url", url);
+
+                  const usersData = await retrieveData("users");
+                  var users = usersData ? JSON.parse(usersData) : null;
+
+                  if (users) {
+                    users++;
+                  }
+
+                  await storeData("users", users);
+
+                  var profile = {
+                    name: NameInput,
+                    url: url,
+                    username: username,
+                    password: password
+                  };
+
+                  setProfiles([...profiles, profile]);
+                  await storeData("profiles", [...profiles, profile]);
+                  setSelectedProfile(users);
+
+                  retrieveUser().then((data) => {
+                    setUser(data);
+                  });
                 }}
-                placeholderTextColor={theme.text}
-                placeholder='New Profile Name'
-                onChangeText={text => setNameInput(text)}
-              />
+              >
+                <Text style={{color: theme.textColored}}>Add Profile</Text>
+              </TouchableOpacity>
             </View>
-            <View className='rounded-lg'>
-              <TextInput
-                className='w-full p-2 rounded-lg'
-                autoCorrect={false}
-                style={{
-                  backgroundColor: theme.card,
-                  color: theme.text,
-                }}
-                placeholderTextColor={theme.text}
-                placeholder='Your IPTV URL'
-                onChangeText={text => setInput(text)}
-              />
-            </View>
-            <TouchableOpacity
-              className='rounded-lg w-full p-2 justify-center items-center'
-              style={{backgroundColor: theme.primary}}
-              onPress={async () => {
-                const splitURL = input.split("?");
-      
-                if (splitURL.length < 2) {
-                  return;
-                }
-
-                if (!splitURL[1].includes("username=") || !splitURL[1].includes("password=")) {
-                  return;
-                }
-
-                if (NameInput === "") {
-                  return;
-                }
-      
-                const searchParams = splitURL[1].split("&").reduce((acc: { [key: string]: any }, cur) => {
-                  const [key, value] = cur.split("=");
-                  acc[key] = value;
-                  return acc;
-                }, {});
-      
-                const username = searchParams["username"];
-                const password = searchParams["password"];
-
-                await storeData("name", NameInput);
-      
-                await storeData("username", username);
-                await storeData("password", password);
-      
-                var url: string = splitURL[0];
-                url = url.substring(0, url.lastIndexOf("/"));
-      
-                await storeData("url", url);
-
-                const usersData = await retrieveData("users");
-                var users = usersData ? JSON.parse(usersData) : null;
-
-                if (users) {
-                  users++;
-                }
-
-                await storeData("users", users);
-
-                var profile = {
-                  name: NameInput,
-                  url: url,
-                  username: username,
-                  password: password
-                };
-
-                setProfiles([...profiles, profile]);
-                await storeData("profiles", [...profiles, profile]);
-                setSelectedProfile(users);
-
-                retrieveUser().then((data) => {
-                  setUser(data);
-                });
-              }}
-            >
-              <Text style={{color: theme.textColored}}>Add Profile</Text>
-            </TouchableOpacity>
-          </View>
           </View>
         </View>
       </ScrollView>

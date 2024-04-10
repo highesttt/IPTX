@@ -1,3 +1,4 @@
+import { MediaType } from "../../utils/MediaType";
 import { MediaDTO } from "./media.dto";
 
 export class MovieDTO extends MediaDTO {
@@ -11,5 +12,6 @@ export class MovieDTO extends MediaDTO {
         this.stream_icon = data.stream_icon;
         this.extension = data.container_extension;
         this.is_adult = data.is_adult;
+        this.type = MediaType.MOVIE;
     }
 }

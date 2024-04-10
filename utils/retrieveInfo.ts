@@ -44,7 +44,7 @@ export async function retrieveCategories(type: MediaType) {
         });
 }
 
-export async function retrieveCategoryInfo(type: MediaType, id: string) {
+export async function retrieveCategoryInfo(type: MediaType, id?: string) {
     if (type === MediaType.LIVE) {
         const url = await buildAPIURL(Action.GET_STREAMS, id);
         if (url === null) {
@@ -80,7 +80,7 @@ export async function retrieveCategoryInfo(type: MediaType, id: string) {
     return [];
 }
 
-export async function retrieveMediaInfo(type: MediaType, id: string) {
+export async function retrieveMediaInfo(type: MediaType, id?: string) {
     if (type === MediaType.MOVIE) {
         const url = await buildAPIURL(Action.GET_MOVIE_INFO, id);
         if (url === null) {

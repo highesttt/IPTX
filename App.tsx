@@ -80,6 +80,22 @@ function SeriesStackScreen() {
     </Stack.Navigator>
   );
 }
+function SearchStackScreen() {
+  const Stack = createNativeStackNavigator();
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        animation: 'simple_push',
+        contentStyle: {backgroundColor: 'transparent'},
+      }}>
+      <Stack.Screen name="SearchScreen" component={SearchScreen} />
+      <Stack.Screen name="MovieView" component={MoviesViewScreen} />
+      <Stack.Screen name="SeriesView" component={SeriesViewScreen} />
+      <Stack.Screen name="Player" component={PlayerScreen} />
+    </Stack.Navigator>
+  );
+}
 
 function App(): React.JSX.Element {
   // var orientation = useDeviceOrientation()
@@ -147,7 +163,7 @@ function App(): React.JSX.Element {
             />
             <Tab.Screen
               name="Search"
-              component={SearchScreen}
+              component={SearchStackScreen}
               options={{
                 tabBarIcon: ({ color }) => (
                   <MaterialCommunityIcons name="magnify" color={color} size={24} />

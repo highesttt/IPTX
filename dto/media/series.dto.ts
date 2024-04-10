@@ -1,3 +1,4 @@
+import { MediaType } from "../../utils/MediaType";
 import { MediaDTO } from "./media.dto";
 
 export class SeriesDTO extends MediaDTO {
@@ -15,5 +16,6 @@ export class SeriesDTO extends MediaDTO {
         this.plot = data.plot;
         this.cast = data.cast;
         this.director = data.director;
+        this.type = MediaType.SERIES;
     }
 }
