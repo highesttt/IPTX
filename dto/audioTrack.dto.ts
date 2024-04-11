@@ -1,5 +1,5 @@
 export class AudioTrackDTO {
-    id: string;
+    id: number;
     language: string;
     selected: boolean;
     title: string;

@@ -6,6 +6,7 @@ import {
   View,
   ImageBackground,
   Linking,
+  ScrollView,
 } from 'react-native';
 
 import { getMaterialYouCurrentTheme } from '../utils/theme';
@@ -42,8 +43,9 @@ function MoviesViewScreen({ route, navigation }: any): React.JSX.Element {
         }}>
           {movie.name}
         </Text>
-        <View className='h-full items-center'>
-
+        <ScrollView className='h-full mb-12' 
+        contentContainerStyle={{ alignItems: 'center' }}
+        >
           <View className='flex flex-row items-center justify-between w-10/12 pb-4'>
             <Text style={{ color: theme.text }} className='text-lg'>{movieInfo?.duration}</Text>
             <Text style={{ color: theme.primary }} className='text-xl'>•</Text>
@@ -64,8 +66,8 @@ function MoviesViewScreen({ route, navigation }: any): React.JSX.Element {
           <Text style={{ color: theme.secondary }} className='pb-1 font-extrabold text-xl w-11/12'>Cast</Text>
           <Text style={{ color: theme.text }} className='pb-4 w-11/12'>{movieInfo?.cast}</Text>
 
-        </View>
-        <View className='bottom-0 absolute w-full gap-2 px-2 items-center flex flex-row'>
+        </ScrollView>
+        <View className='bottom-0 mb-3 absolute w-full gap-2 px-2 items-center flex flex-row'>
           <Button
             style={{ backgroundColor: theme.textColored }}
             className='rounded-lg p-2 w-5/12 flex-1'

@@ -1,5 +1,5 @@
 export class SubtitleTrackDTO {
-    id: string;
+    id: number;
     language: string;
     selected: boolean;
     title: string;
