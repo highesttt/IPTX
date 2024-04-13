@@ -130,8 +130,8 @@ function SeriesCategoryScreen({ route, navigation }: any): React.JSX.Element {
           keyExtractor={(item) => item.id.toString()}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.5}
-          columnWrapperStyle={{ gap: 4 }}
-          contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', gap: 4}}
+          columnWrapperStyle={{ gap: 7 }}
+          contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', gap: 7}}
         />
       )}
     </SafeAreaView>

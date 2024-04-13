@@ -215,8 +215,8 @@ function SearchScreen({navigation}: any): React.JSX.Element {
           renderItem={renderItem}
           // onEndReached={handleLoadMore}
           keyExtractor={(item) => item.id.toString()}
-          columnWrapperStyle={{ gap: 4 }}
-          contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', gap: 4}}
+          columnWrapperStyle={{ gap: 7 }}
+          contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', gap: 7}}
           ListEmptyComponent={
             <Text style={{ color: theme.text, textAlign: 'center' }}>
               No results found
