@@ -21,6 +21,7 @@ function ProfileScreen({navigation}: any): React.JSX.Element {
   const [user, setUser] = useState<UserDTO | null>();
   const isDarkMode = useColorScheme() === 'dark';
   const [profiles, setProfiles] = useState<ProfileDTO[]>([]);
+  const [currentTheme, setCurrentTheme] = useState<string>('');
 
   const theme = getMaterialYouCurrentTheme(isDarkMode);
 
@@ -49,6 +50,12 @@ function ProfileScreen({navigation}: any): React.JSX.Element {
   const [NameInput, setNameInput] = useState<string>('');
   const [selectedProfile, setSelectedProfile] = useState<number>(-1);
 
+  retrieveData("theme").then((data) => {
+    if (data === null || data.length === 0) {
+      return;
+    }
+    setCurrentTheme(JSON.parse(data || ""));
+  });
 
   return (
     <SafeAreaView style={{backgroundColor: theme.background}}>
@@ -69,7 +76,7 @@ function ProfileScreen({navigation}: any): React.JSX.Element {
               style={{backgroundColor: backgroundColor}}>
               <Text className='text-center text-lg font-semibold pt-2' style={{color: theme.text}}>
                 <Text className='text-xl' style={{color: theme.primary}}>
-                  { user?.username } 
+                  { user?.username }
                 </Text>
                 &nbsp;
                 (
@@ -104,6 +111,7 @@ function ProfileScreen({navigation}: any): React.JSX.Element {
           </View>
           <View className='flex-1 flex-col justify-center items-center w-full pt-8'>
             <SelectDropdown
+              key={profiles.length}
               data={profiles}
               onSelect={(selectedItem, index) => {
                 setSelectedProfile(index);
@@ -111,7 +119,7 @@ function ProfileScreen({navigation}: any): React.JSX.Element {
                 storeData("username", selectedItem.username);
                 storeData("password", selectedItem.password);
                 storeData("url", selectedItem.url);
-                
+
                 retrieveUser().then((data) => {
                   setUser(data);
                 });
@@ -239,9 +247,58 @@ function ProfileScreen({navigation}: any): React.JSX.Element {
               </TouchableOpacity>
             </View>
           </View>
+          <View className='flex-1 flex-col justify-center items-center w-full pt-8'>
+            <SelectDropdown
+              data={[
+                {
+                  name: 'System Preferences',
+                  setting: ''
+                },
+                {
+                  name: 'Dark Mode',
+                  setting: 'dark'
+                },
+                {
+                  name: 'Light Mode',
+                  setting: 'light'
+                },
+              ]}
+              onSelect={(selectedItem, index) => {
+                storeData("theme", selectedItem.setting);
+                console.log(selectedItem);
+                setCurrentTheme(selectedItem.setting);
+              }}
+              renderButton={(selectedItem, isOpened) => {
+                return (
+                  <View className='w-10/12 h-12 justify-center items-center px-3 flex flex-row rounded-lg ' style={{backgroundColor: theme.card}}>
+                    <Text numberOfLines={1} ellipsizeMode="tail" className='text-lg font-semibold flex-1' style={{color: theme.text}}>
+                      {selectedItem == null ? 'System Preferences' : selectedItem.name}
+                    </Text>
+                    <Icon name={isOpened ? 'chevron-up' : 'chevron-down'} style={{ color: theme.secondary, fontSize: 24 }} />
+                  </View>
+                );
+              }}
+              renderItem={(item, index, isSelected) => {
+                return (
+                  <View className='items-center'>
+                    <View className='h-12 justify-center items-center px-3 flex flex-row rounded-lg' style={{backgroundColor: theme.card}}>
+                      <Text numberOfLines={1} ellipsizeMode="tail" className='text-lg flex-1 font-semibold'>{currentTheme == '' ? 'System Preferences' : item.name}</Text>
+                      <Icon name={currentTheme == item.setting ? 'check' : 'checkbox-blank-outline'} style={{ color: theme.secondary, fontSize: 24 }} />
+                    </View>
+                    {(index !== 2) && (
+                      <View className='h-0.5 w-11/12' style={{backgroundColor: theme.primary}}></View>
+                    )}
+                  </View>
+                );
+              }}
+              showsVerticalScrollIndicator={false}
+              dropdownStyle={{backgroundColor: theme.card, borderRadius: 8}}
+            />
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 export default ProfileScreen;
+
