@@ -9,13 +9,14 @@ import {
   View,
 } from 'react-native';
 
-import { getMaterialYouCurrentTheme } from '../utils/theme';
+import { getMaterialYouCurrentTheme, getMaterialYouThemes } from '../utils/theme';
 import { retrieveUser } from '../utils/retrieveInfo';
 import { UserDTO } from '../dto/user.dto';
 import { retrieveData, storeData } from '../utils/data';
 import SelectDropdown from 'react-native-select-dropdown';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ProfileDTO } from '../dto/profile.dto';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 function ProfileScreen({navigation}: any): React.JSX.Element {
   const [user, setUser] = useState<UserDTO | null>();
@@ -23,7 +24,10 @@ function ProfileScreen({navigation}: any): React.JSX.Element {
   const [profiles, setProfiles] = useState<ProfileDTO[]>([]);
   const [currentTheme, setCurrentTheme] = useState<string>('');
 
-  const theme = getMaterialYouCurrentTheme(isDarkMode);
+  let theme = getMaterialYouThemes().dark
+  getMaterialYouCurrentTheme(isDarkMode).then((resolvedTheme) => {
+    theme = resolvedTheme;
+  });
 
   useEffect(() => {
     retrieveUser().then((data) => {
@@ -111,7 +115,7 @@ function ProfileScreen({navigation}: any): React.JSX.Element {
           </View>
           <View className='flex-1 flex-col justify-center items-center w-full pt-8'>
             <SelectDropdown
-              key={profiles.length}
+              key={selectedProfile}
               data={profiles}
               onSelect={(selectedItem, index) => {
                 setSelectedProfile(index);
@@ -247,7 +251,7 @@ function ProfileScreen({navigation}: any): React.JSX.Element {
               </TouchableOpacity>
             </View>
           </View>
-          <View className='flex-1 flex-col justify-center items-center w-full pt-8'>
+          {/* <View className='flex-1 flex-col justify-center items-center w-full pt-8'>
             <SelectDropdown
               data={[
                 {
@@ -294,6 +298,17 @@ function ProfileScreen({navigation}: any): React.JSX.Element {
               showsVerticalScrollIndicator={false}
               dropdownStyle={{backgroundColor: theme.card, borderRadius: 8}}
             />
+          </View> */}
+          <View className='flex-1 flex-col justify-center items-center w-full pt-8'>
+            <TouchableOpacity
+              className='rounded-lg p-2 justify-center items-center'
+              style={{backgroundColor: theme.primary}}
+              onPress={() => {
+                navigation.push('BucketList');
+              }}
+            >
+              <MaterialCommunityIcons name='bucket' size={24} color={theme.textColored} />
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>

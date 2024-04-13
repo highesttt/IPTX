@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 
-import { getMaterialYouCurrentTheme } from '../utils/theme';
+import { getMaterialYouCurrentTheme, getMaterialYouThemes } from '../utils/theme';
 import { retrieveCategoryInfo } from '../utils/retrieveInfo';
 import { MediaType } from '../utils/MediaType';
 import { getFlagEmoji } from '../utils/flagEmoji';
@@ -30,7 +30,10 @@ function LiveCategoryScreen({ route, navigation }: any): React.JSX.Element {
   const [visibleCategories, setVisibleCategories] = useState<LiveDTO[]>([]);
   const CHUNK_SIZE = 30;
 
-  const theme = getMaterialYouCurrentTheme(isDarkMode);
+  let theme = getMaterialYouThemes().dark
+  getMaterialYouCurrentTheme(isDarkMode).then((resolvedTheme) => {
+    theme = resolvedTheme;
+  });
 
   const focused = useIsFocused();
 

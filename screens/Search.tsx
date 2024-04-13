@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 
-import { getMaterialYouCurrentTheme } from '../utils/theme';
+import { getMaterialYouCurrentTheme, getMaterialYouThemes } from '../utils/theme';
 import { MovieDTO } from '../dto/media/movie.dto';
 import { retrieveData } from '../utils/data';
 import { retrieveCategoryInfo } from '../utils/retrieveInfo';
@@ -20,19 +20,26 @@ import { useIsFocused } from '@react-navigation/native';
 import { SeriesDTO } from '../dto/media/series.dto';
 import { Card } from 'react-native-paper';
 import { getFlagEmoji } from '../utils/flagEmoji';
+import { LiveDTO } from '../dto/media/live.dto';
+import { globalVars } from '../App';
+import { buildURL } from '../utils/buildUrl';
 
 function SearchScreen({navigation}: any): React.JSX.Element {
   // Example data
   const [series, setSeries] = useState<SeriesDTO[]>([]);
   const [movies, setMovies] = useState<MovieDTO[]>([]);
+  const [tvChannels, setTvChannels] = useState<LiveDTO[]>([]);
   const [profile, setProfile] = useState<string | null>('');
   const [loading, setLoading] = useState(true);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [visibleSearchResults, setVisibleSearchResults] = useState<any[]>([]);
   const isDarkMode = useColorScheme() === 'dark';
   const [input, setInput] = useState<string>('');
-  const theme = getMaterialYouCurrentTheme(isDarkMode);
-  const CHUNK_SIZE = 30;
+  let theme = getMaterialYouThemes().dark
+  getMaterialYouCurrentTheme(isDarkMode).then((resolvedTheme) => {
+    theme = resolvedTheme;
+  });
+  const CHUNK_SIZE = 50;
 
   const focused = useIsFocused();
 
@@ -43,15 +50,17 @@ function SearchScreen({navigation}: any): React.JSX.Element {
         setMovies([]);
         setSeries([]);
         setProfile(name);
-        retrieveCategoryInfo(MediaType.MOVIE).then((data) => {
-            setMovies(data);
-            return;
+        retrieveCategoryInfo(MediaType.LIVE).then((data) => {
+            setTvChannels(data);
+            retrieveCategoryInfo(MediaType.MOVIE).then((data) => {
+                setMovies(data);
+                retrieveCategoryInfo(MediaType.SERIES).then((data) => {
+                    setSeries(data);
+                    setLoading(false);
+                    return;
+                  });
+              });
           });
-        retrieveCategoryInfo(MediaType.SERIES).then((data) => {
-            setSeries(data);
-            return;
-          });
-        setLoading(false);
       } else {
         console.log('Categories already loaded');
       }
@@ -60,6 +69,10 @@ function SearchScreen({navigation}: any): React.JSX.Element {
 
   useEffect(() => {
     // Call your search function when the input changes
+
+      const filteredTvChannels = tvChannels.filter((item) =>
+        item.name?.toLowerCase().includes(input.toLowerCase())
+      );
     
       const filteredSeries = series.filter((item) =>
         item.name?.toLowerCase().includes(input.toLowerCase()) ||
@@ -74,16 +87,16 @@ function SearchScreen({navigation}: any): React.JSX.Element {
         item.name?.toLowerCase().includes(input.toLowerCase())
       );
 
-      setSearchResults([...filteredSeries, ...filteredMovies]);
+      setSearchResults([...filteredTvChannels, ...filteredMovies, ...filteredSeries]);
       setVisibleSearchResults(searchResults.slice(0, CHUNK_SIZE));
   }, [input, series, movies]);
 
 
-  const handleLoadMore = () => {
-    const currentLength = visibleSearchResults.length;
-    const nextChunk = searchResults.slice(currentLength, currentLength + CHUNK_SIZE);
-    setVisibleSearchResults([...visibleSearchResults, ...nextChunk]);
-  };
+  // const handleLoadMore = () => {
+  //   const currentLength = visibleSearchResults.length;
+  //   const nextChunk = searchResults.slice(currentLength, currentLength + CHUNK_SIZE);
+  //   setVisibleSearchResults([...visibleSearchResults, ...nextChunk]);
+  // };
 
   const renderItem = ({ item }: { item: MovieDTO | SeriesDTO }) => {
     var flag = item.name.split(' ')[0];
@@ -104,6 +117,11 @@ function SearchScreen({navigation}: any): React.JSX.Element {
             navigation.push('SeriesView', { series: item });
           else if (item.type === MediaType.MOVIE)
             navigation.push('MovieView', { movie: item });
+          else if (item.type === MediaType.LIVE) {
+            const videoUrl = await buildURL(MediaType.LIVE, item.stream_id);
+            globalVars.isPlayer = true;
+            navigation.push('Player', { url: videoUrl });
+          }
         }}>
         <View>
           <Card.Title
@@ -172,7 +190,14 @@ function SearchScreen({navigation}: any): React.JSX.Element {
                   }}
                   placeholderTextColor={theme.secondary}
                   placeholder='Search...'
-                  onChangeText={text => setInput(text)}
+                  onKeyPress={e => {
+                    if (e.nativeEvent.key === 'Backspace') {
+                      setInput(input.slice(0, -1));
+                    } else if (e.nativeEvent.key !== 'Enter') {
+                      setInput(input + e.nativeEvent.key);
+                    }
+                  }}
+                  numberOfLines={1}
                   onEndEditing={text => setInput(text.nativeEvent.text)}
                 />
               </View>
@@ -190,7 +215,7 @@ function SearchScreen({navigation}: any): React.JSX.Element {
           numColumns={numColumns}
           data={visibleSearchResults}
           renderItem={renderItem}
-          onEndReached={handleLoadMore}
+          // onEndReached={handleLoadMore}
           keyExtractor={(item) => item.id.toString()}
           columnWrapperStyle={{ gap: 4 }}
           contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', gap: 4}}

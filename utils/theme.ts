@@ -35,63 +35,15 @@ export const getMaterialYouThemes = () => {
   return theme;
 }
 
-export const getMaterialYouCurrentTheme = (isDarkMode: boolean) => {
+export const getMaterialYouCurrentTheme = async (isDarkMode: boolean)  => {
   const styles = generateTheme(palette);
-  var style = {
-    background: isDarkMode ? styles.dark.background : styles.light.background,
-    primary: isDarkMode ? styles.dark.primary : styles.light.primary,
-    text: isDarkMode ? styles.dark.text : styles.light.text,
-    textColored: isDarkMode ? styles.dark.textColored : styles.light.textColored,
-    card: isDarkMode ? styles.dark.card : styles.light.card,
-    icon: isDarkMode ? styles.dark.icon : styles.light.icon,
-    secondary: isDarkMode ? styles.dark.secondary : styles.light.secondary,
-  };
 
-  retrieveData('theme').then((value) => {
-    value = JSON.parse(value || '')
-    if (value == 'dark') {
-      style = {
-        background: true ? styles.dark.background : styles.light.background,
-        primary: true ? styles.dark.primary : styles.light.primary,
-        text: true ? styles.dark.text : styles.light.text,
-        textColored: true ? styles.dark.textColored : styles.light.textColored,
-        card: true ? styles.dark.card : styles.light.card,
-        icon: true ? styles.dark.icon : styles.light.icon,
-        secondary: true ? styles.dark.secondary : styles.light.secondary,
-      };
+  // const isDark = await JSON.parse(await retrieveData('theme') || '');
 
-    } else if (value == 'light') {
-      style = {
-        background: false ? styles.dark.background : styles.light.background,
-        primary: false ? styles.dark.primary : styles.light.primary,
-        text: false ? styles.dark.text : styles.light.text,
-        textColored: false ? styles.dark.textColored : styles.light.textColored,
-        card: false ? styles.dark.card : styles.light.card,
-        icon: false ? styles.dark.icon : styles.light.icon,
-        secondary: false ? styles.dark.secondary : styles.light.secondary,
-      };
-    } else {
-      style = {
-        background: isDarkMode ? styles.dark.background : styles.light.background,
-        primary: isDarkMode ? styles.dark.primary : styles.light.primary,
-        text: isDarkMode ? styles.dark.text : styles.light.text,
-        textColored: isDarkMode ? styles.dark.textColored : styles.light.textColored,
-        card: isDarkMode ? styles.dark.card : styles.light.card,
-        icon: isDarkMode ? styles.dark.icon : styles.light.icon,
-        secondary: isDarkMode ? styles.dark.secondary : styles.light.secondary,
-      };
-    }
-  }).catch((error) => {
-    style = {
-      background: isDarkMode ? styles.dark.background : styles.light.background,
-      primary: isDarkMode ? styles.dark.primary : styles.light.primary,
-      text: isDarkMode ? styles.dark.text : styles.light.text,
-      textColored: isDarkMode ? styles.dark.textColored : styles.light.textColored,
-      card: isDarkMode ? styles.dark.card : styles.light.card,
-      icon: isDarkMode ? styles.dark.icon : styles.light.icon,
-      secondary: isDarkMode ? styles.dark.secondary : styles.light.secondary,
-    };
-  });
-  
-  return style;
+  // if (isDark == 'dark') {
+  //   return styles.dark;
+  // } else if (isDark == 'light') {
+  //   return styles.light;
+  // }
+    return isDarkMode ? styles.dark : styles.light;
 }

@@ -96,7 +96,7 @@ export async function retrieveMediaInfo(type: MediaType, id?: string) {
         }
         return await fetch(url)
             .then((response) => response.json())
-            .then((data) => new SeriesInfoDTO(data));
+            .then((data) => new SeriesInfoDTO(data, id || ""));
     }
 
     return null;

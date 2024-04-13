@@ -8,6 +8,7 @@ export class MediaInfoDTO {
     release_date: string;
     genre: string;
     tmdb_id: string;
+    type: string;
     constructor(data: any) {
         this.name = data.info.name;
         this.cover = data.info.cover;
@@ -18,5 +19,6 @@ export class MediaInfoDTO {
         this.release_date = data.info.releasedate;
         this.genre = data.info.genre;
         this.tmdb_id = data.info.tmdb_id;
+        this.type = 'unknown'
     }
 }

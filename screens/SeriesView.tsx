@@ -9,9 +9,10 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  ToastAndroid,
 } from 'react-native';
 
-import { getMaterialYouCurrentTheme } from '../utils/theme';
+import { getMaterialYouCurrentTheme, getMaterialYouThemes } from '../utils/theme';
 import { retrieveMediaInfo } from '../utils/retrieveInfo';
 import { MediaType } from '../utils/MediaType';
 import { buildURL } from '../utils/buildUrl';
@@ -20,6 +21,8 @@ import { globalVars } from '../App';
 import { SeriesInfoDTO } from '../dto/media_info/series_info.dto';
 import { SeriesDTO } from '../dto/media/series.dto';
 import SelectDropdown from 'react-native-select-dropdown';
+import { retrieveData, storeData } from '../utils/data';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 function SeriesViewScreen({ route, navigation }: any): React.JSX.Element {
   const [seriesInfo, setSeriesInfo] = useState<SeriesInfoDTO>();
@@ -27,11 +30,22 @@ function SeriesViewScreen({ route, navigation }: any): React.JSX.Element {
   const [selectedSeason, setSelectedSeason] = useState<number>(1);
   const isDarkMode = useColorScheme() === 'dark';
   const { series }: { series: SeriesDTO } = route.params;
+  const { info }: { info: SeriesInfoDTO } = route.params;
 
-  const theme = getMaterialYouCurrentTheme(isDarkMode);
+  let theme = getMaterialYouThemes().dark
+  getMaterialYouCurrentTheme(isDarkMode).then((resolvedTheme) => {
+    theme = resolvedTheme;
+  });
 
   useEffect(() => {
-    retrieveMediaInfo(MediaType.SERIES, series.stream_id).then((data) => {
+    if (info) {
+      setSeriesInfo(info);
+      const seasons = info.episodes.filter((episode) => episode.season).map((episode) => episode.season);
+      const uniqueSeasons = [...new Set(seasons)];
+      setSeasons(uniqueSeasons);
+      return;
+    }
+    retrieveMediaInfo(MediaType.SERIES, seriesInfo?.stream_id).then((data) => {
       if (data === null) {
         return;
       }
@@ -39,7 +53,6 @@ function SeriesViewScreen({ route, navigation }: any): React.JSX.Element {
       const value = data as SeriesInfoDTO;
       const seasons = value.episodes.filter((episode) => episode.season).map((episode) => episode.season);
       const uniqueSeasons = [...new Set(seasons)];
-      console.log(uniqueSeasons);
       setSeasons(uniqueSeasons);
     });
   }, []);
@@ -47,18 +60,48 @@ function SeriesViewScreen({ route, navigation }: any): React.JSX.Element {
   return (
     <SafeAreaView>
       <ImageBackground className='w-full h-full' source={{ uri: seriesInfo?.background }} imageStyle={{ opacity: 0.15 }} resizeMode='cover'>
+        <View className='flex flex-row justify-between'>
         <Text className='text-2xl p-4 font-bold' style={{
           color: theme.primary,
         }}>
-          {series.name}
+          {seriesInfo?.name}
         </Text>
+          <TouchableOpacity
+            className="rounded-full bg-transparent p-2 bottom-0"
+            onPress={async () => {
+              const bucket = await retrieveData('bucket');
+              var currentBucketList = await JSON.parse(bucket || '[]');
+              var currentItem = "series-" + seriesInfo?.stream_id;
+              if (currentBucketList && currentBucketList.includes(currentItem)) {
+                console.log('Item Already in Bucket List');
+                console.log(currentBucketList);
+                await storeData('bucket', currentBucketList);
+                // toast notification
+                ToastAndroid.show(
+                  "Already in Bucket List",
+                  ToastAndroid.LONG,
+                );
+                return;
+              };
+              currentBucketList = [...currentBucketList, currentItem];
+              await storeData('bucket', currentBucketList);
+              // toast notification
+              ToastAndroid.show(
+                "Added to Bucket List",
+                ToastAndroid.LONG,
+              );
+            }}
+          >
+            <MaterialCommunityIcons name={"bucket"} size={40} color={theme.primary} />
+          </TouchableOpacity>
+        </View>
         <ScrollView className='h-full mb-16' 
         contentContainerStyle={{ alignItems: 'center' }}
         >
           <View className='flex flex-row items-center justify-between w-10/12 pb-4'>
             <Text style={{ color: theme.text }} className='text-lg'>{seriesInfo?.episodes.length} Episodes</Text>
             <Text style={{ color: theme.primary }} className='text-xl'>•</Text>
-            <Text style={{ color: theme.text}} className='text-lg'>TMDb  {series.rating}/10</Text>
+            <Text style={{ color: theme.text}} className='text-lg'>TMDb  {seriesInfo?.rating}/10</Text>
             <Text style={{ color: theme.primary }} className='text-xl'>•</Text>
             <Text style={{ color: theme.text }} className='text-lg'>{seriesInfo?.release_date?.split('-')[0]}</Text>
           </View>

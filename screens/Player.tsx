@@ -1,5 +1,5 @@
 import { DimensionValue, Text, TouchableOpacity, TouchableWithoutFeedback, View, useColorScheme, useWindowDimensions } from "react-native";
-import { getMaterialYouCurrentTheme } from "../utils/theme";
+import { getMaterialYouCurrentTheme, getMaterialYouThemes } from "../utils/theme";
 import Video, { SelectedTrackType, VideoRef } from "react-native-video";
 import { useEffect, useState } from "react";
 import { AudioTrackDTO } from "../dto/audioTrack.dto";
@@ -10,6 +10,7 @@ import { Animated } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { formatTime } from "../utils/formatTime";
 import { Slider } from "react-native-elements";
+import { retrieveData, storeData } from "../utils/data";
 
 function PlayerScreen({route, navigation}: any) {
 
@@ -33,7 +34,10 @@ function PlayerScreen({route, navigation}: any) {
   var player: VideoRef | null = null;
 
   const isDarkMode = useColorScheme() === 'dark';
-  const theme = getMaterialYouCurrentTheme(isDarkMode);
+  let theme = getMaterialYouThemes().dark
+  getMaterialYouCurrentTheme(isDarkMode).then((resolvedTheme) => {
+    theme = resolvedTheme;
+  });
 
   // when the user presses the back button on android
   navigation.addListener('beforeRemove', (e: any) => {
@@ -234,44 +238,48 @@ function PlayerScreen({route, navigation}: any) {
                   <MaterialCommunityIcons name={"chevron-left"} size={40} color={theme.primary} />
                 </TouchableOpacity>
                 <View className="flex flex-row">
-                  <TouchableOpacity
-                    className="rounded-full bg-transparent p-2 bottom-0"
-                    onPress={() => {
-                      if (popupOpened == 1)
-                        setPopupOpened(0);
-                      else {
-                        setPopupOpened(1);
-                        Animated.timing(fadeAnim, {
-                          toValue: 0,
-                          duration: 100,
-                          useNativeDriver: true,
-                        }).start(() => {
-                          setControls(false);
-                        });
-                      }
-                    }}
-                  >
-                    <MaterialCommunityIcons name={"translate"} size={40} color={theme.primary} />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    className="rounded-full bg-transparent p-2 bottom-0"
-                    onPress={() => {
-                      if (popupOpened == 2)
-                        setPopupOpened(0);
-                      else {
-                        setPopupOpened(2);
-                        Animated.timing(fadeAnim, {
-                          toValue: 0,
-                          duration: 100,
-                          useNativeDriver: true,
-                        }).start(() => {
-                          setControls(false);
-                        });
-                      }
-                    }}
-                  >
-                    <MaterialCommunityIcons name={"subtitles"} size={40} color={theme.primary} />
-                  </TouchableOpacity>
+                  {audioTracks.length > 1 ?
+                    <TouchableOpacity
+                      className="rounded-full bg-transparent p-2 bottom-0"
+                      onPress={() => {
+                        if (popupOpened == 1)
+                          setPopupOpened(0);
+                        else {
+                          setPopupOpened(1);
+                          Animated.timing(fadeAnim, {
+                            toValue: 0,
+                            duration: 100,
+                            useNativeDriver: true,
+                          }).start(() => {
+                            setControls(false);
+                          });
+                        }
+                      }}
+                    >
+                      <MaterialCommunityIcons name={"translate"} size={40} color={theme.primary} />
+                    </TouchableOpacity>
+                  : null}
+                  {subtitles.length > 0 ?
+                    <TouchableOpacity
+                      className="rounded-full bg-transparent p-2 bottom-0"
+                      onPress={() => {
+                        if (popupOpened == 2)
+                          setPopupOpened(0);
+                        else {
+                          setPopupOpened(2);
+                          Animated.timing(fadeAnim, {
+                            toValue: 0,
+                            duration: 100,
+                            useNativeDriver: true,
+                          }).start(() => {
+                            setControls(false);
+                          });
+                        }
+                      }}
+                    >
+                      <MaterialCommunityIcons name={"subtitles"} size={40} color={theme.primary} />
+                    </TouchableOpacity>
+                  : null}
                 </View>
               </View>
             </View>
@@ -366,16 +374,14 @@ function PlayerScreen({route, navigation}: any) {
               return new AudioTrackDTO(audio);
             }));
             const audioTrack = audioTracks.find((audioTrack: AudioTrackDTO) => audioTrack.selected === true);
-            console.log(audioTrack);
             setSelectedAudioTrack(audioTrack);
-            console.log(subtitles);
           }}
           onPlaybackRateChange={(data: any) => {
             setPlayBackRate(data.playbackRate);
           }}
           onProgress={(data: any) => {
             setPosition(data.currentTime);
-            setDuration(data.seekableDuration);
+            setDuration(data.seekableDuration < 0 ? 0 : data.seekableDuration); 
           }}
           selectedAudioTrack={{
             type: selectedAudioTrack ? SelectedTrackType.TITLE : SelectedTrackType.DISABLED,
@@ -385,14 +391,6 @@ function PlayerScreen({route, navigation}: any) {
             type: selectedTextTrack ? SelectedTrackType.TITLE : SelectedTrackType.DISABLED,
             value: selectedTextTrack ? selectedTextTrack.title : 0
           }}
-          onTextTracks={(data: any) => {
-            console.log(data);
-          }}
-
-          // selectedAudioTrack={{
-          //   type: SelectedTrackType.TITLE,
-          //   value: 2
-          // }}
         />
       </TouchableOpacity>
     </SafeAreaView>

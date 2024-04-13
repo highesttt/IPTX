@@ -2,8 +2,6 @@ import { MediaType } from "../../utils/MediaType";
 import { MediaDTO } from "./media.dto";
 
 export class SeriesDTO extends MediaDTO {
-    stream_id: string;
-    stream_icon: string;
     genre: string;
     plot: string;
     cast: string;

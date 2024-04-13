@@ -15,7 +15,7 @@ import SearchScreen from './screens/Search.tsx';
 
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import {getMaterialYouCurrentTheme} from './utils/theme.ts';
+import {getMaterialYouCurrentTheme, getMaterialYouThemes} from './utils/theme.ts';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LiveCategoryScreen from './screens/LiveCategory.tsx';
@@ -26,6 +26,7 @@ import MoviesViewScreen from './screens/MoviesView.tsx';
 import ProfileScreen from './screens/Profile.tsx';
 import SeriesCategoryScreen from './screens/SeriesCategory.tsx';
 import SeriesViewScreen from './screens/SeriesView.tsx';
+import BucketListScreen from './screens/BucketList.tsx';
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -96,12 +97,32 @@ function SearchStackScreen() {
     </Stack.Navigator>
   );
 }
+function ProfileStackScreen() {
+  const Stack = createNativeStackNavigator();
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        animation: 'simple_push',
+        contentStyle: {backgroundColor: 'transparent'},
+      }}>
+      <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+      <Stack.Screen name="BucketList" component={BucketListScreen} />
+      <Stack.Screen name="MovieView" component={MoviesViewScreen} />
+      <Stack.Screen name="SeriesView" component={SeriesViewScreen} />
+      <Stack.Screen name="Player" component={PlayerScreen} />
+    </Stack.Navigator>
+  );
+}
 
 function App(): React.JSX.Element {
   // var orientation = useDeviceOrientation()
 
   const isDarkMode = useColorScheme() === 'dark';
-  const style = getMaterialYouCurrentTheme(isDarkMode)
+  let style = getMaterialYouThemes().dark
+  getMaterialYouCurrentTheme(isDarkMode).then((resolvedTheme) => {
+    style = resolvedTheme;
+  });
 
   return (
     <SafeAreaProvider>
@@ -172,7 +193,7 @@ function App(): React.JSX.Element {
             />
             <Tab.Screen
               name="Profile"
-              component={ProfileScreen}
+              component={ProfileStackScreen}
               options={{
                 tabBarIcon: ({ color }) => (
                   <MaterialCommunityIcons name="account" color={color} size={24} />
