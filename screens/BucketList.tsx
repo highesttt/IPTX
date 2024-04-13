@@ -31,10 +31,7 @@ function BucketListScreen({ route, navigation }: any): React.JSX.Element {
   const [visibleCategories, setVisibleCategories] = useState<(MovieInfoDTO | SeriesInfoDTO)[]>([]);
   const CHUNK_SIZE = 30;
 
-  let theme = getMaterialYouThemes().dark
-  getMaterialYouCurrentTheme(isDarkMode).then((resolvedTheme) => {
-  theme = resolvedTheme;
-  });
+  let theme = getMaterialYouCurrentTheme(isDarkMode);
 
   const focused = useIsFocused();
 

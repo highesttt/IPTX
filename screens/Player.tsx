@@ -18,6 +18,7 @@ function PlayerScreen({route, navigation}: any) {
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
   const [fadeAnim] = useState(new Animated.Value(0));  // Initial value for opacity: 1
   const {url} = route.params;
+  const {name} = route.params;
 
   const [audioTracks, setAudioTracks] = useState<AudioTrackDTO[]>([]);
   const [subtitles, setSubtitles] = useState<SubtitleTrackDTO[]>([]);
@@ -32,12 +33,9 @@ function PlayerScreen({route, navigation}: any) {
   const [popupOpened, setPopupOpened] = useState<number>(0);
 
   var player: VideoRef | null = null;
-
   const isDarkMode = useColorScheme() === 'dark';
-  let theme = getMaterialYouThemes().dark
-  getMaterialYouCurrentTheme(isDarkMode).then((resolvedTheme) => {
-    theme = resolvedTheme;
-  });
+
+  let theme = getMaterialYouCurrentTheme(isDarkMode);
 
   // when the user presses the back button on android
   navigation.addListener('beforeRemove', (e: any) => {
@@ -181,6 +179,11 @@ function PlayerScreen({route, navigation}: any) {
           return (
             <TouchableOpacity
               onPress={() => {
+                if (selectedTextTrack && selectedTextTrack.id === option.id) {
+                  setSelectedTextTrack(null);
+                  setPopupOpened(0);
+                  return;
+                }
                 selectTextTrack(option.id);
                 setPopupOpened(0);
               }}
@@ -229,14 +232,19 @@ function PlayerScreen({route, navigation}: any) {
           >
             <View>
               <View className="flex flex-row justify-between">
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.goBack();
-                  }}
-                  className="rounded-full bg-transparent p-2 bottom-0"
-                >
-                  <MaterialCommunityIcons name={"chevron-left"} size={40} color={theme.primary} />
-                </TouchableOpacity>
+                <View className="flex flex-row align-middle text-center items-center">
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.goBack();
+                    }}
+                    className="rounded-full bg-transparent p-2 bottom-0"
+                  >
+                    <MaterialCommunityIcons name={"chevron-left"} size={40} color={theme.primary} />
+                  </TouchableOpacity>
+                  <Text style={{ color: theme.primary }} className="text-lg font-bold items-start">
+                    {name}
+                  </Text>
+                </View>
                 <View className="flex flex-row">
                   {audioTracks.length > 1 ?
                     <TouchableOpacity

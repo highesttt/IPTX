@@ -35,7 +35,7 @@ export const getMaterialYouThemes = () => {
   return theme;
 }
 
-export const getMaterialYouCurrentTheme = async (isDarkMode: boolean)  => {
+export const getMaterialYouCurrentTheme = (isDarkMode: boolean)  => {
   const styles = generateTheme(palette);
 
   // const isDark = await JSON.parse(await retrieveData('theme') || '');

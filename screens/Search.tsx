@@ -35,10 +35,8 @@ function SearchScreen({navigation}: any): React.JSX.Element {
   const [visibleSearchResults, setVisibleSearchResults] = useState<any[]>([]);
   const isDarkMode = useColorScheme() === 'dark';
   const [input, setInput] = useState<string>('');
-  let theme = getMaterialYouThemes().dark
-  getMaterialYouCurrentTheme(isDarkMode).then((resolvedTheme) => {
-    theme = resolvedTheme;
-  });
+
+  let theme = getMaterialYouCurrentTheme(isDarkMode);
   const CHUNK_SIZE = 50;
 
   const focused = useIsFocused();
@@ -120,7 +118,7 @@ function SearchScreen({navigation}: any): React.JSX.Element {
           else if (item.type === MediaType.LIVE) {
             const videoUrl = await buildURL(MediaType.LIVE, item.stream_id);
             globalVars.isPlayer = true;
-            navigation.push('Player', { url: videoUrl });
+            navigation.push('Player', { url: videoUrl, name: item.name });
           }
         }}>
         <View>

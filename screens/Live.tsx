@@ -21,10 +21,7 @@ function LiveScreen({navigation}: any): React.JSX.Element {
   const [profile, setProfile] = useState<string | null>('');
   const isDarkMode = useColorScheme() === 'dark';
 
-    let theme = getMaterialYouThemes().dark
-    getMaterialYouCurrentTheme(isDarkMode).then((resolvedTheme) => {
-      theme = resolvedTheme;
-    });
+  let theme = getMaterialYouCurrentTheme(isDarkMode);
 
   const focused = useIsFocused();
 

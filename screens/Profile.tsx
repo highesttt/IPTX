@@ -24,10 +24,7 @@ function ProfileScreen({navigation}: any): React.JSX.Element {
   const [profiles, setProfiles] = useState<ProfileDTO[]>([]);
   const [currentTheme, setCurrentTheme] = useState<string>('');
 
-  let theme = getMaterialYouThemes().dark
-  getMaterialYouCurrentTheme(isDarkMode).then((resolvedTheme) => {
-    theme = resolvedTheme;
-  });
+  let theme = getMaterialYouCurrentTheme(isDarkMode);
 
   useEffect(() => {
     retrieveUser().then((data) => {

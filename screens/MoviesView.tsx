@@ -28,10 +28,7 @@ function MoviesViewScreen({ route, navigation }: any): React.JSX.Element {
   const { movie }: { movie: MovieDTO } = route.params;
   const { info }: { info: MovieInfoDTO } = route.params;
 
-  let theme = getMaterialYouThemes().dark
-  getMaterialYouCurrentTheme(isDarkMode).then((resolvedTheme) => {
-    theme = resolvedTheme;
-  });
+  let theme = getMaterialYouCurrentTheme(isDarkMode);
 
   useEffect(() => {
     if (info) {
@@ -112,7 +109,7 @@ function MoviesViewScreen({ route, navigation }: any): React.JSX.Element {
             onPress={async () => {
               const videoUrl = await buildURL(MediaType.MOVIE, movieInfo?.stream_id || '', movieInfo?.extension || '');
               globalVars.isPlayer = true;
-              navigation.navigate('Player', { url: videoUrl });
+              navigation.push('Player', { url: videoUrl, name: movieInfo?.name });
             }}>
             <Text style={{ color: theme.primary }}>Play</Text>
           </Button>

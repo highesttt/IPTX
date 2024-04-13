@@ -119,11 +119,7 @@ function App(): React.JSX.Element {
   // var orientation = useDeviceOrientation()
 
   const isDarkMode = useColorScheme() === 'dark';
-  let style = getMaterialYouThemes().dark
-  getMaterialYouCurrentTheme(isDarkMode).then((resolvedTheme) => {
-    style = resolvedTheme;
-  });
-
+  let style = getMaterialYouCurrentTheme(isDarkMode);
   return (
     <SafeAreaProvider>
       <NavigationContainer>
@@ -135,7 +131,6 @@ function App(): React.JSX.Element {
             initialRouteName="Live"
             activeColor={style.primary}
             inactiveColor={style.text}
-            
             barStyle={{
               backgroundColor: style.background,
               // display: orientation == 'landscape' ? 'none' : 'flex',

@@ -32,10 +32,7 @@ function SeriesViewScreen({ route, navigation }: any): React.JSX.Element {
   const { series }: { series: SeriesDTO } = route.params;
   const { info }: { info: SeriesInfoDTO } = route.params;
 
-  let theme = getMaterialYouThemes().dark
-  getMaterialYouCurrentTheme(isDarkMode).then((resolvedTheme) => {
-    theme = resolvedTheme;
-  });
+  let theme = getMaterialYouCurrentTheme(isDarkMode);
 
   useEffect(() => {
     if (info) {
@@ -45,7 +42,7 @@ function SeriesViewScreen({ route, navigation }: any): React.JSX.Element {
       setSeasons(uniqueSeasons);
       return;
     }
-    retrieveMediaInfo(MediaType.SERIES, seriesInfo?.stream_id).then((data) => {
+    retrieveMediaInfo(MediaType.SERIES, series?.stream_id).then((data) => {
       if (data === null) {
         return;
       }
@@ -161,7 +158,8 @@ function SeriesViewScreen({ route, navigation }: any): React.JSX.Element {
                 onPress={async () => {
                   const videoUrl = await buildURL(MediaType.SERIES, episode.id, episode.extension);
                   globalVars.isPlayer = true;
-                  navigation.navigate('Player', { url: videoUrl });
+                  const title = episode.title.trim()
+                  navigation.push('Player', { url: videoUrl, name: title.length > 30 ? title.substring(0, 30) + "..." : title});
                 }}
               >
                 {/* View that takes the whole width of the parent with 2 cols, one where it has the background and the other with the info */}
