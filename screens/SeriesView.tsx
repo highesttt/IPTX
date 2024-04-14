@@ -12,7 +12,7 @@ import {
   ToastAndroid,
 } from 'react-native';
 
-import { getMaterialYouCurrentTheme, getMaterialYouThemes } from '../utils/theme';
+import { getMaterialYouCurrentTheme } from '../utils/theme';
 import { retrieveMediaInfo } from '../utils/retrieveInfo';
 import { MediaType } from '../utils/MediaType';
 import { buildURL } from '../utils/buildUrl';
@@ -66,23 +66,22 @@ function SeriesViewScreen({ route, navigation }: any): React.JSX.Element {
           <TouchableOpacity
             className="rounded-full bg-transparent p-2 bottom-0"
             onPress={async () => {
-              const bucket = await retrieveData('bucket');
-              var currentBucketList = await JSON.parse(bucket || '[]');
+              const profile = await retrieveData('name');
+              const bucket = await retrieveData('bucket-' + profile);
+              var currentBucketList: string[] = await JSON.parse(bucket || '[]');
               var currentItem = "series-" + seriesInfo?.stream_id;
               if (currentBucketList && currentBucketList.includes(currentItem)) {
-                console.log('Item Already in Bucket List');
-                console.log(currentBucketList);
-                await storeData('bucket', currentBucketList);
-                // toast notification
+                var itemToRemove = currentBucketList.indexOf(currentItem);
+                currentBucketList.splice(itemToRemove, 1);
+                await storeData('bucket-' + profile, currentBucketList);
                 ToastAndroid.show(
-                  "Already in Bucket List",
+                  "Removed from Bucket List",
                   ToastAndroid.LONG,
                 );
                 return;
               };
               currentBucketList = [...currentBucketList, currentItem];
-              await storeData('bucket', currentBucketList);
-              // toast notification
+              await storeData('bucket-' + profile, currentBucketList);
               ToastAndroid.show(
                 "Added to Bucket List",
                 ToastAndroid.LONG,
@@ -105,19 +104,18 @@ function SeriesViewScreen({ route, navigation }: any): React.JSX.Element {
 
           <Text style={{ color: theme.secondary }} className='pb-1 font-extrabold text-xl w-11/12'>Plot</Text>
           <Text style={{ color: theme.text }} className='pb-4 w-11/12'>{seriesInfo?.plot}</Text>
-          
+
           <Text style={{ color: theme.secondary }} className='pb-1 font-extrabold text-xl w-11/12'>Genres</Text>
           <Text style={{ color: theme.text }} className='pb-4 w-11/12'>{seriesInfo?.genre}</Text>
 
           <Text style={{ color: theme.secondary }} className='pb-1 font-extrabold text-xl w-11/12'>Director</Text>
           <Text style={{ color: theme.text }} className='pb-4 w-11/12'>{seriesInfo?.director}</Text>
-          
+
           <Text style={{ color: theme.secondary }} className='pb-1 font-extrabold text-xl w-11/12'>Cast</Text>
           <Text style={{ color: theme.text }} className='pb-4 w-11/12'>{seriesInfo?.cast}</Text>
 
-        {/* dropdown to select season */}
         <View className='flex flex-row items-center justify-between w-10/12 pb-4'>
-          
+
           <SelectDropdown
             key={new Date().getTime()}
             data={seasons}
@@ -162,12 +160,16 @@ function SeriesViewScreen({ route, navigation }: any): React.JSX.Element {
                   navigation.push('Player', { url: videoUrl, name: title.length > 30 ? title.substring(0, 30) + "..." : title});
                 }}
               >
-                {/* View that takes the whole width of the parent with 2 cols, one where it has the background and the other with the info */}
                 <View className='flex-row w-11/12 h-20 m-2 ' style={{ backgroundColor: theme.card, borderRadius: 10 }}>
-                  <Image source={{ uri: episode.background }} style={{ borderRadius: 10 }} className='h-fit w-20 flex' />
-                  <View className='flex flex-col ml-2'>
+                  <Image
+                    source={{ uri: episode.background }}
+                    style={{ borderRadius: 10 }}
+                    defaultSource={{ uri: seriesInfo.background != '' ? seriesInfo.background : seriesInfo.cover}}
+                    className='h-fit w-20 flex'
+                  />
+                  <View className='flex flex-col ml-2 justify-center w-full'>
                     <Text style={{ color: theme.text }} className='text-base'>Season {episode.season} Episode {episode.episode}</Text>
-                    <Text numberOfLines={1} ellipsizeMode="tail" style={{ color: theme.text }} className='text-sm'></Text>
+                    <Text numberOfLines={1} style={{ color: theme.text }} className='text-sm w-[70%] self-start'>{episode.title}</Text>
                     <Text numberOfLines={1} ellipsizeMode="tail" style={{ color: theme.text }} className='text-sm'>{episode.duration}</Text>
                   </View>
                 </View>

@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 
-import { getMaterialYouCurrentTheme, getMaterialYouThemes } from '../utils/theme';
+import { getMaterialYouCurrentTheme } from '../utils/theme';
 import { retrieveUser } from '../utils/retrieveInfo';
 import { UserDTO } from '../dto/user.dto';
 import { retrieveData, storeData } from '../utils/data';

@@ -1,5 +1,4 @@
 export function getFlagEmoji(countryCode: string) {
-  // remove all special characters from the country code
   var code = countryCode.replace(/[^a-zA-Z]/g, '');
   if (!code) {
     return '';

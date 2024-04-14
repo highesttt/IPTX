@@ -11,7 +11,7 @@ import {
   ToastAndroid,
 } from 'react-native';
 
-import { getMaterialYouCurrentTheme, getMaterialYouThemes } from '../utils/theme';
+import { getMaterialYouCurrentTheme } from '../utils/theme';
 import { retrieveMediaInfo } from '../utils/retrieveInfo';
 import { MediaType } from '../utils/MediaType';
 import { buildURL } from '../utils/buildUrl';
@@ -44,7 +44,6 @@ function MoviesViewScreen({ route, navigation }: any): React.JSX.Element {
   }, []);
 
   return (
-    // set the background of the view to "movieInfo.background", add a title, plot and a button to play the movie
     <SafeAreaView>
       <ImageBackground className='w-full h-full' source={{ uri: movieInfo?.background }} imageStyle={{ opacity: 0.15 }} resizeMode='cover'>
         <View className='flex flex-row justify-between'>
@@ -56,19 +55,22 @@ function MoviesViewScreen({ route, navigation }: any): React.JSX.Element {
           <TouchableOpacity
             className="rounded-full bg-transparent p-2 bottom-0"
             onPress={async () => {
-              const bucket = await retrieveData('bucket');
+              const profile = await retrieveData('name');
+              const bucket = await retrieveData('bucket-' + profile);
               var currentBucketList = await JSON.parse(bucket || '[]');
               var currentItem = "movie-" + movieInfo?.stream_id;
               if (currentBucketList && currentBucketList.includes(currentItem)) {
-                await storeData('bucket', currentBucketList);
+                var itemToRemove = currentBucketList.indexOf(currentItem);
+                currentBucketList.splice(itemToRemove, 1);
+                await storeData('bucket-' + profile, currentBucketList);
                 ToastAndroid.show(
-                  "Already in Bucket List",
+                  "Removed from Bucket List",
                   ToastAndroid.LONG,
                 );
                 return;
               };
               currentBucketList = [...currentBucketList, currentItem];
-              await storeData('bucket', currentBucketList);
+              await storeData('bucket-' + profile, currentBucketList);
               ToastAndroid.show(
                 "Added to Bucket List",
                 ToastAndroid.LONG,

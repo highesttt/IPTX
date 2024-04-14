@@ -1,7 +1,7 @@
-import { DimensionValue, Text, TouchableOpacity, TouchableWithoutFeedback, View, useColorScheme, useWindowDimensions } from "react-native";
-import { getMaterialYouCurrentTheme, getMaterialYouThemes } from "../utils/theme";
-import Video, { SelectedTrackType, VideoRef } from "react-native-video";
-import { useEffect, useState } from "react";
+import { DimensionValue, PanResponder, Text, TouchableOpacity, View, useColorScheme } from "react-native";
+import { getMaterialYouCurrentTheme } from "../utils/theme";
+import Video, {SelectedTrackType, VideoRef } from "react-native-video";
+import { useEffect, useRef, useState } from "react";
 import { AudioTrackDTO } from "../dto/audioTrack.dto";
 import { SubtitleTrackDTO } from "../dto/subtitleTrack.dto";
 import { globalVars } from '../App';
@@ -10,13 +10,14 @@ import { Animated } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { formatTime } from "../utils/formatTime";
 import { Slider } from "react-native-elements";
-import { retrieveData, storeData } from "../utils/data";
+import { getLanguageName } from "../utils/languages";
+import ScreenBrightness from 'react-native-screen-brightness';
 
 function PlayerScreen({route, navigation}: any) {
 
   const [controls, setControls] = useState<boolean>(false);
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
-  const [fadeAnim] = useState(new Animated.Value(0));  // Initial value for opacity: 1
+  const [fadeAnim] = useState(new Animated.Value(0));
   const {url} = route.params;
   const {name} = route.params;
 
@@ -37,7 +38,28 @@ function PlayerScreen({route, navigation}: any) {
 
   let theme = getMaterialYouCurrentTheme(isDarkMode);
 
-  // when the user presses the back button on android
+  const [brightness, setBrightness] = useState(1.0);
+  const [volume, setVolume] = useState(1.0);
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderMove: (evt, gestureState) => {
+        const { dx, dy } = gestureState;
+        const brightnessChange = -dy / 200;
+        const volumeChange = -dx / 200;
+
+        // console.log(brightnessChange, volumeChange);
+
+        ScreenBrightness.setBrightness(brightness + brightnessChange);
+        setBrightness(brightness => Math.min(Math.max(brightness + brightnessChange, 0), 1));
+
+        const newVolume = Math.min(Math.max(volume + volumeChange, 0), 1);
+        setVolume(newVolume);
+      },
+    })
+  ).current;
+
   navigation.addListener('beforeRemove', (e: any) => {
     globalVars.isPlayer = false;
   });
@@ -49,7 +71,6 @@ function PlayerScreen({route, navigation}: any) {
   }, [seek]);
 
   useEffect(() => {
-    console.log(isSeeking);
     return () => {
       if (player && isSeeking != 0) {
         player.pause();
@@ -150,21 +171,36 @@ function PlayerScreen({route, navigation}: any) {
 
     return (
       <View className={'h-full z-10 flex-col items-center justify-center w-full bg-black/50 '}>
-        {options.map((option: AudioTrackDTO) => {
-          return (
+        <View className="justify-center items-center rounded-lg p-4" style={{backgroundColor: theme.background}}>
+          <View className="flex flex-row justify-between items-center pb-4">
+            <Text style={{ color: theme.primary }} className="text-lg font-bold">Select an Audio Track</Text>
             <TouchableOpacity
               onPress={() => {
-                selectAudioTrack(option.id);
                 setPopupOpened(0);
               }}
-              key={option.id}
-              className="rounded-lg p-2 w-5/12 text-center m-1"
-              style={{backgroundColor: theme.card}}
+              className="rounded-full bg-transparent pl-4 bottom-0"
             >
-              <Text>{option.title} - {option.language} - {(option.id == selectedTrack).toString()}</Text>
+              <MaterialCommunityIcons name={"close"} size={25} color={theme.icon} />
             </TouchableOpacity>
-          );
-        })}
+          </View>
+          {options.map((option: AudioTrackDTO) => {
+            return (
+              <TouchableOpacity
+                onPress={() => {
+                  selectAudioTrack(option.id);
+                  setPopupOpened(0);
+                }}
+                key={option.id}
+                className="rounded-lg p-2 w-full text-center m-1"
+                style={{backgroundColor: option.id == selectedTrack ? theme.secondary : theme.card}}
+              >
+                <Text
+                  style={{color: theme.text}}
+                >{option.title} - {getLanguageName(option.language)}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       </View>
     )
   };
@@ -175,32 +211,45 @@ function PlayerScreen({route, navigation}: any) {
 
     return (
       <View className={'h-full z-10 flex-col items-center justify-center w-full bg-black/50 '}>
-        {options.map((option: SubtitleTrackDTO) => {
-          return (
+        <View className="justify-center items-center rounded-lg p-4" style={{backgroundColor: theme.background}}>
+          <View className="flex flex-row justify-between items-center pb-4">
+            <Text style={{ color: theme.primary }} className="text-lg font-bold">Select Subtitles</Text>
             <TouchableOpacity
               onPress={() => {
-                if (selectedTextTrack && selectedTextTrack.id === option.id) {
-                  setSelectedTextTrack(null);
-                  setPopupOpened(0);
-                  return;
-                }
-                selectTextTrack(option.id);
                 setPopupOpened(0);
               }}
-              key={option.id}
-              className="rounded-lg p-2 w-5/12 text-center m-1"
-              style={{backgroundColor: theme.card}}
+              className="rounded-full bg-transparent pl-4 bottom-0"
             >
-              <Text>{option.title} - {option.language} - {(option.id == selectedTrack).toString()}</Text>
+              <MaterialCommunityIcons name={"close"} size={25} color={theme.icon} />
             </TouchableOpacity>
-          );
-        })}
+          </View>
+          {options.map((option: SubtitleTrackDTO) => {
+            return (
+              <TouchableOpacity
+                onPress={() => {
+                  if (selectedTextTrack && selectedTextTrack.id === option.id) {
+                    setSelectedTextTrack(null);
+                    setPopupOpened(0);
+                    return;
+                  }
+                  selectTextTrack(option.id);
+                  setPopupOpened(0);
+                }}
+                key={option.id}
+                className="rounded-lg p-2 w-5/12 text-center m-1"
+                style={{backgroundColor: option.id == selectedTrack ? theme.secondary : theme.card}}
+              >
+                <Text>{option.title} - {getLanguageName(option.language)}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       </View>
     )
   };
 
   return (
-    <SafeAreaView style={{backgroundColor: '#000000'}}>
+    <SafeAreaView style={{backgroundColor: '#000000'}} {...panResponder.panHandlers}>
       <TouchableOpacity
         activeOpacity={1}
         style={{
@@ -211,7 +260,6 @@ function PlayerScreen({route, navigation}: any) {
         onPress={() => {
           handleScreenClick();
         }}
-        
       >
         {popupOpened == 1 ?
           <View className={'h-full absolute z-10 flex-1 flex-col items-center justify-center w-full bg-black/50 ' + (popupOpened == 1 ? '' : 'pointer-events-none')}>
@@ -222,9 +270,8 @@ function PlayerScreen({route, navigation}: any) {
             {openSubtitlePopup(subtitles)}
           </View>
           : null
-          
         }
-          <Animated.View 
+          <Animated.View
             style={{
               opacity: fadeAnim,
             }}
@@ -253,6 +300,8 @@ function PlayerScreen({route, navigation}: any) {
                         if (popupOpened == 1)
                           setPopupOpened(0);
                         else {
+                          const track: AudioTrackDTO = (audioTracks.find((audioTrack) => audioTrack.id === selectedAudioTrack?.id) || audioTracks.find((audioTrack) => audioTrack.selected === true)) as AudioTrackDTO;
+                          selectAudioTrack(track.id);
                           setPopupOpened(1);
                           Animated.timing(fadeAnim, {
                             toValue: 0,
@@ -330,7 +379,6 @@ function PlayerScreen({route, navigation}: any) {
                   <MaterialCommunityIcons name="fast-forward-10" size={40} color={theme.primary} />
                 </TouchableOpacity>
               </View>
-            {/* make the seek bar */}
             <Slider
               key={duration}
               value={position}
@@ -389,7 +437,7 @@ function PlayerScreen({route, navigation}: any) {
           }}
           onProgress={(data: any) => {
             setPosition(data.currentTime);
-            setDuration(data.seekableDuration < 0 ? 0 : data.seekableDuration); 
+            setDuration(data.seekableDuration < 0 ? 0 : data.seekableDuration);
           }}
           selectedAudioTrack={{
             type: selectedAudioTrack ? SelectedTrackType.TITLE : SelectedTrackType.DISABLED,
@@ -399,15 +447,21 @@ function PlayerScreen({route, navigation}: any) {
             type: selectedTextTrack ? SelectedTrackType.TITLE : SelectedTrackType.DISABLED,
             value: selectedTextTrack ? selectedTextTrack.title : 0
           }}
+          volume={volume}
         />
+        {/* <Text style={{ position: 'absolute', top: 20, left: 20, color: 'white' }}>
+            Brightness: {brightness.toFixed(2)}
+        </Text>
+        <Text style={{ position: 'absolute', top: 50, left: 20, color: 'white' }}>
+            Volume: {volume.toFixed(2)}
+        </Text> */}
       </TouchableOpacity>
     </SafeAreaView>
   );
-  
 }
 
 PlayerScreen.navigationOptions = {
-  tabBarVisible: false, // Hide the tab bar
-  headerShown: false, // Hide the header
+  tabBarVisible: false,
+  headerShown: false,
 };
 export default PlayerScreen;

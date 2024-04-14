@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 
-import { getMaterialYouCurrentTheme, getMaterialYouThemes } from '../utils/theme';
+import { getMaterialYouCurrentTheme } from '../utils/theme';
 import { retrieveCategories } from '../utils/retrieveInfo';
 import { MediaType } from '../utils/MediaType';
 import { CategoryDTO } from '../dto/category.dto';

@@ -9,7 +9,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 
-import { getMaterialYouCurrentTheme, getMaterialYouThemes } from '../utils/theme';
+import { getMaterialYouCurrentTheme } from '../utils/theme';
 import { retrieveCategoryInfo } from '../utils/retrieveInfo';
 import { MediaType } from '../utils/MediaType';
 import { getFlagEmoji } from '../utils/flagEmoji';
@@ -107,7 +107,6 @@ function MoviesCategoryScreen({ route, navigation }: any): React.JSX.Element {
     );
   };
 
-  // calculate how many columns we can fit
   const windowWidth = useWindowDimensions().width;
   const numColumns = Math.floor(windowWidth / 180);
 

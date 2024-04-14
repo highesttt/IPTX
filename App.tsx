@@ -15,12 +15,11 @@ import SearchScreen from './screens/Search.tsx';
 
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import {getMaterialYouCurrentTheme, getMaterialYouThemes} from './utils/theme.ts';
+import {getMaterialYouCurrentTheme} from './utils/theme.ts';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LiveCategoryScreen from './screens/LiveCategory.tsx';
 import PlayerScreen from './screens/Player.tsx';
-import { useDeviceOrientation } from '@react-native-community/hooks';
 import MoviesCategoryScreen from './screens/MoviesCategory.tsx';
 import MoviesViewScreen from './screens/MoviesView.tsx';
 import ProfileScreen from './screens/Profile.tsx';

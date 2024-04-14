@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 
-import { getMaterialYouCurrentTheme, getMaterialYouThemes } from '../utils/theme';
+import { getMaterialYouCurrentTheme } from '../utils/theme';
 import { MovieDTO } from '../dto/media/movie.dto';
 import { retrieveData } from '../utils/data';
 import { retrieveCategoryInfo } from '../utils/retrieveInfo';
@@ -25,7 +25,6 @@ import { globalVars } from '../App';
 import { buildURL } from '../utils/buildUrl';
 
 function SearchScreen({navigation}: any): React.JSX.Element {
-  // Example data
   const [series, setSeries] = useState<SeriesDTO[]>([]);
   const [movies, setMovies] = useState<MovieDTO[]>([]);
   const [tvChannels, setTvChannels] = useState<LiveDTO[]>([]);
@@ -66,8 +65,6 @@ function SearchScreen({navigation}: any): React.JSX.Element {
   }, [focused]);
 
   useEffect(() => {
-    // Call your search function when the input changes
-
       const filteredTvChannels = tvChannels.filter((item) =>
         item.name?.toLowerCase().includes(input.toLowerCase())
       );

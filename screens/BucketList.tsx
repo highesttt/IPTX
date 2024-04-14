@@ -9,17 +9,13 @@ import {
   useWindowDimensions,
 } from 'react-native';
 
-import { getMaterialYouCurrentTheme, getMaterialYouThemes } from '../utils/theme';
-import { retrieveCategoryInfo, retrieveMediaInfo } from '../utils/retrieveInfo';
+import { getMaterialYouCurrentTheme } from '../utils/theme';
+import { retrieveMediaInfo } from '../utils/retrieveInfo';
 import { MediaType } from '../utils/MediaType';
 import { getFlagEmoji } from '../utils/flagEmoji';
-import { MovieDTO } from '../dto/media/movie.dto';
 import { Card } from 'react-native-paper';
 import { useIsFocused } from '@react-navigation/native';
 import { retrieveData } from '../utils/data';
-import { MediaDTO } from '../dto/media/media.dto';
-import { MediaInfoDTO } from '../dto/media_info/media_info.dto';
-import { SeriesDTO } from '../dto/media/series.dto';
 import { MovieInfoDTO } from '../dto/media_info/movie_info.dto';
 import { SeriesInfoDTO } from '../dto/media_info/series_info.dto';
 
@@ -38,14 +34,13 @@ function BucketListScreen({ route, navigation }: any): React.JSX.Element {
   useEffect(() => {
     retrieveData('name').then((name) => {
       if (categories.length === 0 || name !== profile) {
-        console.log('Loading categories');
         setCategories([]);
         setProfile(name);
-        retrieveData('bucket').then((data) => {
-          // every item in the bucket list is a string in the format "type-stream_id"
+        retrieveData('bucket-' + name).then((data) => {
           const bucketList = JSON.parse(data || '[]');
-          console.log(bucketList);
-          // retrieve the info for each item in the bucket list
+          if (bucketList.length === 0) {
+            setLoading(false);
+          }
           for (let i = 0; i < bucketList.length; i++) {
             const item = bucketList[i].split('-');
             retrieveMediaInfo((item[0] + '/') as MediaType, item[1]).then((data) => {
@@ -130,7 +125,6 @@ function BucketListScreen({ route, navigation }: any): React.JSX.Element {
     );
   };
 
-  // calculate how many columns we can fit
   const windowWidth = useWindowDimensions().width;
   const numColumns = Math.floor(windowWidth / 180);
 
@@ -146,6 +140,7 @@ function BucketListScreen({ route, navigation }: any): React.JSX.Element {
           <ActivityIndicator size="large" color={theme?.primary} />
         </View>
       ) : (
+      categories.length > 0 ? (
         <FlatList
           key={numColumns}
           numColumns={numColumns}
@@ -157,6 +152,13 @@ function BucketListScreen({ route, navigation }: any): React.JSX.Element {
           columnWrapperStyle={{ gap: 7 }}
           contentContainerStyle={{ justifyContent: 'center', alignItems: 'center', gap: 7}}
         />
+        ) : (
+          <View className='flex-1 items-center justify-center'>
+            <Text className='text-lg' style={{ color: theme?.text }}>
+              Your bucket list is empty!
+            </Text>
+          </View>
+        )
       )}
     </SafeAreaView>
   );

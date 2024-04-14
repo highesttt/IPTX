@@ -3,14 +3,13 @@ import {
   ActivityIndicator,
   FlatList,
   SafeAreaView,
-  ScrollView,
   Text,
   TouchableOpacity,
   useColorScheme,
   View,
 } from 'react-native';
 
-import { getMaterialYouCurrentTheme, getMaterialYouThemes } from '../utils/theme';
+import { getMaterialYouCurrentTheme } from '../utils/theme';
 import { retrieveCategoryInfo } from '../utils/retrieveInfo';
 import { MediaType } from '../utils/MediaType';
 import { getFlagEmoji } from '../utils/flagEmoji';
