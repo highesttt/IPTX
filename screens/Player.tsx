@@ -332,7 +332,8 @@ function PlayerScreen({route, navigation}: any) {
                   maximumValue={0.2}
                   step={0.005}
                   onValueChange={(volume) => {
-                    setVolume(volume)
+                    setVolume(volume);
+                    handleItemClick();
                   }}
                   orientation="vertical"
                   allowTouchTrack={true}
