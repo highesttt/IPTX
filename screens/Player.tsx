@@ -9,9 +9,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Animated } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { formatTime } from "../utils/formatTime";
-import { Slider } from "react-native-elements";
+import { Slider } from "@rneui/base";
 import { getLanguageName } from "../utils/languages";
-import ScreenBrightness from 'react-native-screen-brightness';
 
 function PlayerScreen({route, navigation}: any) {
 
@@ -38,27 +37,7 @@ function PlayerScreen({route, navigation}: any) {
 
   let theme = getMaterialYouCurrentTheme(isDarkMode);
 
-  const [brightness, setBrightness] = useState(1.0);
-  const [volume, setVolume] = useState(1.0);
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onPanResponderMove: (evt, gestureState) => {
-        const { dx, dy } = gestureState;
-        const brightnessChange = -dy / 200;
-        const volumeChange = -dx / 200;
-
-        // console.log(brightnessChange, volumeChange);
-
-        ScreenBrightness.setBrightness(brightness + brightnessChange);
-        setBrightness(brightness => Math.min(Math.max(brightness + brightnessChange, 0), 1));
-
-        const newVolume = Math.min(Math.max(volume + volumeChange, 0), 1);
-        setVolume(newVolume);
-      },
-    })
-  ).current;
+  const [volume, setVolume] = useState(0.1);
 
   navigation.addListener('beforeRemove', (e: any) => {
     globalVars.isPlayer = false;
@@ -249,7 +228,7 @@ function PlayerScreen({route, navigation}: any) {
   };
 
   return (
-    <SafeAreaView style={{backgroundColor: '#000000'}} {...panResponder.panHandlers}>
+    <SafeAreaView style={{backgroundColor: '#000000'}}>
       <TouchableOpacity
         activeOpacity={1}
         style={{
@@ -340,6 +319,31 @@ function PlayerScreen({route, navigation}: any) {
                 </View>
               </View>
             </View>
+            <View className="justify-end flex flex-col h-1/4 items-end">
+              <View className="flex gap-2 items-center">
+                <MaterialCommunityIcons name={volume == 0.2 ?
+                                              "volume-mute" :
+                                                volume <= 0.1 ? "volume-high" :
+                                              "volume-medium"
+                                            } color={theme.primary} size={24} />
+                <Slider
+                  key="volumeSlider"
+                  value={volume}
+                  maximumValue={0.2}
+                  step={0.005}
+                  onValueChange={(volume) => {
+                    setVolume(volume)
+                  }}
+                  orientation="vertical"
+                  allowTouchTrack={true}
+                  thumbTintColor={theme.primary}
+                  minimumTrackTintColor={theme.text}
+                  maximumTrackTintColor={theme.secondary}
+                  thumbStyle={{ width: 15, height: 15, borderRadius: 15 }}
+                  style={{ height: "80%" }}
+                />
+              </View>
+            </View>
             <View className="items-center">
               <View className="flex flex-row">
                 <TouchableOpacity
@@ -383,6 +387,7 @@ function PlayerScreen({route, navigation}: any) {
               key={duration}
               value={position}
               maximumValue={duration}
+              allowTouchTrack={true}
               onSlidingComplete={
                 (value) => {
                   setSeek(value);
@@ -447,7 +452,7 @@ function PlayerScreen({route, navigation}: any) {
             type: selectedTextTrack ? SelectedTrackType.TITLE : SelectedTrackType.DISABLED,
             value: selectedTextTrack ? selectedTextTrack.title : 0
           }}
-          volume={volume}
+          volume={0.2 - volume}
         />
         {/* <Text style={{ position: 'absolute', top: 20, left: 20, color: 'white' }}>
             Brightness: {brightness.toFixed(2)}
