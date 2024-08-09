@@ -10,7 +10,7 @@ export class MediaInfoDTO {
     tmdb_id: string;
     type: string;
     constructor(data: any) {
-        this.name = data.info.name;
+        this.name = data.info.name == undefined ? data.movie_data.name : data.info.name;
         this.cover = data.info.cover;
         this.plot = data.info.plot
         this.background = data.info.backdrop_path[0];

@@ -11,6 +11,8 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { formatTime } from "../utils/formatTime";
 import { Slider } from "@rneui/base";
 import { getLanguageName } from "../utils/languages";
+import { VolumeManager } from 'react-native-volume-manager';
+import DeviceBrightness from '@adrianso/react-native-device-brightness';
 
 function PlayerScreen({route, navigation}: any) {
 
@@ -37,7 +39,10 @@ function PlayerScreen({route, navigation}: any) {
 
   let theme = getMaterialYouCurrentTheme(isDarkMode);
 
-  const [volume, setVolume] = useState(0.1);
+  const [volume, setVolume] = useState(0.5);
+  const [brightness, setBrightness] = useState(0.5);
+
+  VolumeManager.showNativeVolumeUI({ enabled: false});
 
   navigation.addListener('beforeRemove', (e: any) => {
     globalVars.isPlayer = false;
@@ -48,6 +53,32 @@ function PlayerScreen({route, navigation}: any) {
       player.seek(seek);
     }
   }, [seek]);
+
+  useEffect(() => {
+    VolumeManager.setVolume(1 - volume);
+  }, [volume]);
+
+  useEffect(() => {
+    DeviceBrightness.setBrightnessLevel(brightness);
+  }, [brightness]);
+
+
+  useEffect(() => {
+    const volumeListener = VolumeManager.addVolumeListener((result) => {
+       // returns the current volume as a float (0-1)
+      setVolume(1 - result.volume);
+  
+      // on android, the result object will also have the keys
+      // music, system, ring, alarm, notification
+    });
+  
+    // clean up function
+    return function () {
+      // remove listener, just call .remove on the volumeListener
+      // EventSubscription. Never forget to clean up your listeners.
+      volumeListener.remove();
+    }
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -245,7 +276,7 @@ function PlayerScreen({route, navigation}: any) {
             {openAudioPopup(audioTracks)}
           </View>
           : popupOpened == 2 ?
-          <View className={'h-full absolute z-10 flex-1 flex-col items-center justify-center w-full bg-black/50 ' + (popupOpened == 2 ? '' : 'pointer-events-none')}>
+          <View className={'h-full absolute z-10 flex-1 flex-col items-center justify-center w-full bg-black/50' + (popupOpened == 2 ? '' : 'pointer-events-none')}>
             {openSubtitlePopup(subtitles)}
           </View>
           : null
@@ -319,30 +350,58 @@ function PlayerScreen({route, navigation}: any) {
                 </View>
               </View>
             </View>
-            <View className="justify-end flex flex-col h-1/4 items-end">
-              <View className="flex gap-2 items-center">
-                <MaterialCommunityIcons name={volume == 0.2 ?
-                                              "volume-mute" :
-                                                volume <= 0.1 ? "volume-high" :
-                                              "volume-medium"
-                                            } color={theme.primary} size={24} />
-                <Slider
-                  key="volumeSlider"
-                  value={volume}
-                  maximumValue={0.2}
-                  step={0.005}
-                  onValueChange={(volume) => {
-                    setVolume(volume);
-                    handleItemClick();
-                  }}
-                  orientation="vertical"
-                  allowTouchTrack={true}
-                  thumbTintColor={theme.primary}
-                  minimumTrackTintColor={theme.text}
-                  maximumTrackTintColor={theme.secondary}
-                  thumbStyle={{ width: 15, height: 15, borderRadius: 15 }}
-                  style={{ height: "80%" }}
-                />
+            <View className="flex flex-row justify-between h-1/4 items-center">
+              <View className="justify-end flex flex-col h-full items-start">
+                <View className="flex gap-2 items-center">
+                  <MaterialCommunityIcons name={brightness == 1 ?
+                                                "brightness-5" :
+                                                brightness <= 0.5 ? "brightness-7" :
+                                                "brightness-6"
+                                              } color={theme.primary} size={24} />
+                  <Slider
+                    key="brightnessSlider"
+                    value={brightness}
+                    maximumValue={1}
+                    step={0.05}
+                    onValueChange={(brightness) => {
+                      setBrightness(brightness);
+                      handleItemClick();
+                    }}
+                    orientation="vertical"
+                    allowTouchTrack={true}
+                    thumbTintColor={theme.primary}
+                    minimumTrackTintColor={theme.text}
+                    maximumTrackTintColor={theme.secondary}
+                    thumbStyle={{ width: 15, height: 15, borderRadius: 15 }}
+                    style={{ height: "80%" }}
+                  />
+                </View>
+              </View>
+              <View className="justify-end flex flex-col h-full items-end">
+                <View className="flex gap-2 items-center">
+                  <MaterialCommunityIcons name={volume == 1 ?
+                                                "volume-mute" :
+                                                  volume <= 0.5 ? "volume-high" :
+                                                "volume-medium"
+                                              } color={theme.primary} size={24} />
+                  <Slider
+                    key="volumeSlider"
+                    value={volume}
+                    maximumValue={1}
+                    step={0.01}
+                    onValueChange={(volume) => {
+                      setVolume(volume);
+                      handleItemClick();
+                    }}
+                    orientation="vertical"
+                    allowTouchTrack={true}
+                    thumbTintColor={theme.primary}
+                    minimumTrackTintColor={theme.text}
+                    maximumTrackTintColor={theme.secondary}
+                    thumbStyle={{ width: 15, height: 15, borderRadius: 15 }}
+                    style={{ height: "80%" }}
+                  />
+                </View>
               </View>
             </View>
             <View className="items-center">
@@ -453,7 +512,7 @@ function PlayerScreen({route, navigation}: any) {
             type: selectedTextTrack ? SelectedTrackType.TITLE : SelectedTrackType.DISABLED,
             value: selectedTextTrack ? selectedTextTrack.title : 0
           }}
-          volume={0.2 - volume}
+          volume={1}
         />
         {/* <Text style={{ position: 'absolute', top: 20, left: 20, color: 'white' }}>
             Brightness: {brightness.toFixed(2)}
