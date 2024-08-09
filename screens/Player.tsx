@@ -59,7 +59,7 @@ function PlayerScreen({route, navigation}: any) {
   }, [volume]);
 
   useEffect(() => {
-    DeviceBrightness.setBrightnessLevel(brightness);
+    DeviceBrightness.setBrightnessLevel(1 - brightness);
   }, [brightness]);
 
 
