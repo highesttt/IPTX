@@ -1,0 +1,29 @@
+diff --git a/node_modules/react-native-elements/dist/avatar/Avatar.js b/node_modules/react-native-elements/dist/avatar/Avatar.js
+index 5af80ea..fb2bced 100644
+--- a/node_modules/react-native-elements/dist/avatar/Avatar.js
++++ b/node_modules/react-native-elements/dist/avatar/Avatar.js
+@@ -43,7 +43,7 @@ const AvatarComponent = (_a) => {
+     const hidePlaceholder = !(source && source.uri);
+     const imageContainerStyle = StyleSheet.flatten([
+         styles.overlayContainer,
+-        rounded && { borderRadius: width / 2, overflow: 'hidden' },
++        rounded && { borderRadius: width / 8, overflow: 'hidden' },
+         overlayContainerStyle,
+         imageProps && imageProps.containerStyle,
+     ]);
+@@ -53,13 +53,13 @@ const AvatarComponent = (_a) => {
+     return (<Component onPress={onPress} onLongPress={onLongPress} style={StyleSheet.flatten([
+             styles.container,
+             { height, width },
+-            rounded && { borderRadius: width / 2 },
++            rounded && { borderRadius: width / 8 },
+             containerStyle,
+         ])} {...attributes}>
+       <Image placeholderStyle={StyleSheet.flatten([
+             placeholderStyle,
+             hidePlaceholder && styles.hiddenPlaceholderStyle,
+-        ])} PlaceholderContent={PlaceholderContent} containerStyle={imageContainerStyle} source={source} borderRadius={rounded ? width / 2 : undefined} {...imageProps} style={StyleSheet.flatten([
++        ])} PlaceholderContent={PlaceholderContent} containerStyle={imageContainerStyle} source={source} borderRadius={rounded ? width / 8 : undefined} {...imageProps} style={StyleSheet.flatten([
+             styles.avatar,
+             imageProps && imageProps.style,
+             avatarStyle,
