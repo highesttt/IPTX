@@ -1,79 +1,82 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+<h1 align="center">
+IPTX - Personal Project
+</h1>
 
-# Getting Started
+</br>
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+## Done by [Highest](https://github.com/highesttt)
 
-## Step 1: Start the Metro Server
+This project is an app to watch your IPTV streams on. It is compatible with Android only. <br>
+Simply add your m3u url to the profiles page, and you're set! <br>
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+## Requirements 📝
 
-To start Metro, run the following command from the _root_ of your React Native project:
+- [npm, yarn, pnpm, bun](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 
-```bash
-# using npm
-npm start
+## How to compile? 🧑‍💻
 
-# OR using Yarn
-yarn start
-```
-
-## Step 2: Start your Application
-
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
-
-### For Android
+Getting the source code straight from GitHub? Compile using these steps below
 
 ```bash
-# using npm
-npm run android
-
-# OR using Yarn
-yarn android
+$ git clone https://github.com/highesttt/IPTX.git IPTX
+$ cd IPTX
+$ npm i
+$ cd android
+$ ./gradlew assembleRelease (or assembleDebug)
 ```
 
-### For iOS
+## Screenshots 🖼️
+| | |
+:-------------------------:|:-------------------------:
+![](https://github.com/user-attachments/assets/9b69edca-57f2-4969-abd0-1a27779ecf0f) | ![](https://github.com/user-attachments/assets/db780696-e48f-43d6-8ef9-5a685110a4eb)
+![](https://github.com/user-attachments/assets/61ca8437-0de4-46f4-89f0-1a9eb535bcbf) | ![](https://github.com/user-attachments/assets/5a661070-d811-4de9-9289-2bf6e23cde85)
+![](https://github.com/user-attachments/assets/97488a78-d1fc-4e18-8fb0-26f7f7982807) | ![](https://github.com/user-attachments/assets/3b38adad-8ce8-4b3f-9e14-7fe3aa11cf23)
 
-```bash
-# using npm
-npm run ios
+## Different tools used to make this project: 🛠️
 
-# OR using Yarn
-yarn ios
+![Main tools](https://skillicons.dev/icons?i=githubactions,vscode,md,npm,react,tailwind&perline=9)
+
+## Download 📥
+
+You can download the latest release [here](https://github.com/highesttt/IPTX/releases/latest)
+
+## Commit norms 📝
+
+### Commit message format 📜
+
+Every commit message should be formatted like this:
+
+```
+[<type>] <message>
 ```
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+### Commit types 📌
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+- **`ADD`**: Add a new file or feature
+- **`FIX`**: Fix a bug
+- **`EDIT`**: Edit an existing file
+- **`DEL`**: Delete a file or feature
+- **`DOC`**: Add or edit documentation
+- **`RECODE`**: Refactor code
+- **`CLEAN`**: Clean up code
+- **`MERGE`**: Merge branches
 
-## Step 3: Modifying your App
+### Commit message example 📄
 
-Now that you have successfully run the app, let's modify it.
+```
+[ADD] Added more tests
+Added overflow tests
+90% lines, 100% functions, 75% branches
+```
 
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
+```
+[EDIT] Edited exception naming
+Edited the exception naming to match the coding style
+```
 
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+### Commit message rules 📏
 
-## Congratulations! :tada:
+- The first letter of the commit message should be capitalized
+- The commit message should be written in English
+- The commit message should be clear and concise
 
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
